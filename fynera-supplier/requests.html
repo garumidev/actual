@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buyer Requests | Fynera</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .request-card { transition: all 0.2s ease; }
+    .request-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <div class="w-60 bg-white border-r border-gray-200 min-h-screen p-5">
+      <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
+      <nav class="mt-10 space-y-1">
+        <a href="dashboard.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Dashboard</a>
+        <a href="products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
+        <a href="requests.html" class="block px-3 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
+        <a href="profile.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Profile</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Buyer Requests</h1>
+        <p class="text-gray-500 mt-1">Respond to incoming product requests from buyers.</p>
+      </div>
+
+      <div id="requests-list" class="space-y-5"></div>
+      <div id="loading" class="text-gray-500 mt-8">Loading requests...</div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadRequests() {
+      // Step 1: Get all pending requests
+      const { data: requests, error: reqError } = await supabase
+        .from('requests')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (reqError) {
+        document.getElementById('loading').textContent = '❌ Error: ' + reqError.message;
+        return;
+      }
+
+      if (requests.length === 0) {
+        document.getElementById('requests-list').innerHTML = `
+          <div class="text-center py-12">
+            <div class="text-gray-400 mb-4">📭</div>
+            <p class="text-gray-500">No pending requests.</p>
+          </div>
+        `;
+        document.getElementById('loading').style.display = 'none';
+        return;
+      }
+
+      // Step 2: Get all unique buyer_ids and product_ids
+      const buyerIds = [...new Set(requests.map(r => r.buyer_id).filter(Boolean))];
+      const productIds = [...new Set(requests.map(r => r.product_id).filter(Boolean))];
+
+      // Step 3: Fetch buyers and products separately
+      const [buyersRes, productsRes] = await Promise.all([
+        buyerIds.length > 0 
+          ? supabase.from('users').select('id, name').in('id', buyerIds)
+          : Promise.resolve({ data: [] }),
+        productIds.length > 0 
+          ? supabase.from('products').select('id, name, region').in('id', productIds)
+          : Promise.resolve({ data: [] })
+      ]);
+
+      // Step 4: Create lookup maps
+      const buyerMap = new Map(buyersRes.data.map(u => [u.id, u.name || 'Anonymous']));
+      const productMap = new Map(productsRes.data.map(p => [p.id, { name: p.name || 'Unknown Product', region: p.region || '—' }]));
+
+      // Step 5: Render cards
+      const list = document.getElementById('requests-list');
+      list.innerHTML = '';
+      requests.forEach(req => {
+        const buyerName = buyerMap.get(req.buyer_id) || 'Anonymous Buyer';
+        const product = productMap.get(req.product_id) || { name: 'Unknown Product', region: '—' };
+
+        const card = document.createElement('div');
+        card.className = 'request-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm';
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold text-gray-900">${product.name}</h3>
+              <p class="text-sm text-gray-600 mt-1">From: <span class="font-medium">${buyerName}</span></p>
+            </div>
+            <span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">Pending</span>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-600">
+            <div><span class="font-medium">Quantity:</span> ${req.quantity || '—'} units</div>
+            <div><span class="font-medium">Region:</span> ${product.region}</div>
+            <div><span class="font-medium">Requested:</span> ${new Date(req.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="mt-5 flex space-x-3">
+            <button 
+              onclick="updateStatus('${req.id}', 'accepted')" 
+              class="flex-1 bg-emerald-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-emerald-700"
+            >
+              Accept
+            </button>
+            <button 
+              onclick="updateStatus('${req.id}', 'declined')" 
+              class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg text-sm font-medium hover:bg-gray-300"
+            >
+              Decline
+            </button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    async function updateStatus(requestId, newStatus) {
+      const { error } = await supabase
+        .from('requests')
+        .update({ status: newStatus })
+        .eq('id', requestId);
+
+      if (error) {
+        alert('Error: ' + error.message);
+      } else {
+        location.reload();
+      }
+    }
+
+    // Load when page opens
+    loadRequests();
+  </script>
+</body>
+</html>
