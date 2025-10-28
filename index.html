@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fynera AI — Agricultural Trade Reimagined</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest/dist/lucide.min.js"></script>
+
+  <style>
+    :root {
+      --main-blue: #3B82F6;
+      --mint-green: #10B981;
+      --buttercup: #F59E0B;
+      --neutral-light: #f8f9fa;
+      --neutral-gray: #e9ecef;
+      --neutral-dark: #212529;
+      --text-dark: #212529;
+      --text-light: #ffffff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --border: 1px solid #dee2e6;
+      --radius: 8px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background-color: var(--neutral-light);
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Questrial', sans-serif;
+      font-weight: 500;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: var(--neutral-dark);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .navbar .logo {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--main-blue);
+    }
+
+    .nav-dropdown {
+      position: relative;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      min-width: 150px;
+      z-index: 1001;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 0.75rem 1.5rem;
+      color: var(--text-dark);
+      text-decoration: none;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--neutral-gray);
+    }
+
+    .login-btn {
+      background: var(--main-blue);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .login-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      color: white;
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5rem 5%;
+      background: var(--neutral-dark);
+      color: white;
+      gap: 3rem;
+    }
+
+    .hero-text {
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .hero-text h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text p {
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      background: var(--main-blue);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .hero-image {
+      flex: 1;
+      max-width: 500px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Benefits & Features Sections */
+    .section {
+      padding: 5rem 5%;
+      background: rgb(252, 246, 246);
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+      font-size: 2rem;
+    }
+
+    .benefits-grid,
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .benefit-card,
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: var(--border);
+      transition: var(--transition);
+    }
+
+    .benefit-card:hover,
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .benefit-card h3,
+    .feature-card h3 {
+      margin-bottom: 1rem;
+      color: var(--main-blue);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--main-blue);
+      margin-bottom: 1rem;
+    }
+
+    /* FAQ Styles */
+    .faq-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .faq-item {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .faq-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+
+    .faq-question {
+      font-family: 'Questrial', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark); /* BLACK */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+      margin: 0;
+      line-height: 1.5;
+      color: var(--mint-green); /* GREEN */
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: 0.75rem;
+    }
+
+    .faq-question::after {
+      content: "▼";
+      font-size: 0.7rem;
+      color: var(--text-dark);
+      transform: rotate(0deg);
+      transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-question::after {
+      transform: rotate(180deg);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, var(--main-blue), var(--mint-green));
+      color: white;
+      text-align: center;
+      padding: 5rem 5%;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      opacity: 0.9;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cta-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .cta-btn.supplier {
+      background: white;
+      color: var(--main-blue);
+    }
+
+    .cta-btn.supplier:hover {
+      background: #f8f9fa;
+      transform: translateY(-1px);
+    }
+
+    .cta-btn.buyer {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid white;
+    }
+
+    .cta-btn.buyer:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .cta-btn.logistics {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .cta-btn.logistics:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--neutral-dark);
+      color: white;
+      padding: 2rem 5%;
+      text-align: center;
+    }
+
+    .footer-links {
+      margin: 1rem 0;
+    }
+
+    .footer-links a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--main-blue);
+    }
+
+    .social-icons {
+      margin: 1rem 0;
+    }
+
+    .social-icons a {
+      color: white;
+      margin: 0 0.5rem;
+      font-size: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .social-icons a:hover {
+      color: var(--main-blue);
+    }
+
+    /* Mobile Menu - Hidden by default */
+    .mobile-menu {
+      display: none;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 3rem 5%;
+      }
+
+      .hero-text {
+        max-width: 100%;
+        order: 2;
+      }
+
+      .hero-image {
+        order: 1;
+        max-width: 100%;
+      }
+
+      .hero-text h1 {
+        font-size: 2rem;
+      }
+
+      .section {
+        padding: 3rem 5%;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      /* Two columns for cards on mobile */
+      .benefits-grid,
+      .features-grid,
+      .faq-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+      }
+
+      .hero-buttons,
+      .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Hide desktop nav */
+      .nav-links {
+        display: none;
+      }
+
+      /* Show mobile toggle */
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      /* Mobile Menu Styles */
+      .mobile-menu {
+        display: flex;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background: var(--neutral-dark);
+        padding: 2rem;
+        flex-direction: column;
+        gap: 1.5rem;
+        transition: right 0.3s ease;
+        z-index: 1100;
+      }
+
+      .mobile-menu.active {
+        right: 0;
+      }
+
+      .mobile-menu .close-btn {
+        align-self: flex-end;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .mobile-menu .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .mobile-menu .nav-links a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.2rem;
+      }
+
+      .mobile-menu .login-btn {
+        margin-top: auto;
+        align-self: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="#" class="logo">Fynera AI</a>
+    <button class="mobile-menu-toggle" id="menu-toggle">☰</button>
+    <ul class="nav-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">Marketplace</a></li>
+      <li class="nav-dropdown">
+        <a href="#">Solutions</a>
+        <div class="dropdown-menu">
+          <a href="#">For Suppliers</a>
+          <a href="#">For Buyers</a>
+          <a href="#">For Logistics</a>
+        </div>
+      </li>
+    </ul>
+    <a href="login.html" class="login-btn">Login</a>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="close-btn" id="close-menu">&times;</button>
+    <ul class="nav-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">Marketplace</a></li>
+      <li><a href="#">Solutions</a></li>
+    </ul>
+    <a href="login.html" class="login-btn">Login</a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Agricultural trade reimagined through intelligent technology</h1>
+      <p>Connecting farmers, buyers, and logistics with real-time data and smart matching. Transform how agricultural goods move across markets.</p>
+      <div class="hero-buttons">
+        <a href="#" class="btn-primary">Explore platform</a>
+        <a href="#about-us" class="btn-secondary">Learn more</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="img/pexels-todd-trapani-488382-1382102.jpg" alt="Farmers and buyers collaborating">
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="section" id="about-us">
+    <h2 class="section-title">Why Choose Fynera AI?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <h3>For Suppliers</h3>
+        <p>Reach more buyers, reduce waste, and get fair prices through dynamic market matching powered by AI.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>For Buyers</h3>
+        <p>Source quality produce directly from verified farms with real-time inventory and price transparency.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>For Logistics Providers</h3>
+        <p>Optimize routes, fill empty trucks, and increase efficiency with smart load-matching and scheduling tools.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section">
+    <h2 class="section-title">Our Core Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-monitor-cog"><path d="M12 17v4"/><path d="m14.305 7.53.923-.382"/><path d="m15.228 4.852-.923-.383"/><path d="m16.852 3.228-.383-.924"/><path d="m16.852 8.772-.383.923"/><path d="m19.148 3.228.383-.924"/><path d="m19.53 9.696-.382-.924"/><path d="m20.772 4.852.924-.383"/><path d="m20.772 7.148.924.383"/><path d="M22 13v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><path d="M8 21h8"/><circle cx="18" cy="6" r="3"/></svg>
+        </div>
+        <h3>Smart Matching Engine</h3>
+        <p>AI-driven matching connects suppliers and buyers based on location, quality, quantity, and price — instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database-zap"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 15 21.84"/><path d="M21 5V8"/><path d="M21 12L18 17H22L19 22"/><path d="M3 12A9 3 0 0 0 14.59 14.87"/></svg>
+        </div>
+        <h3>Data-Driven Insights</h3>
+        <p>Real-time analytics, market trends, and predictive pricing help you make smarter trading decisions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+        </div>
+        <h3>Logistics Coordination</h3>
+        <p>Seamlessly coordinate transport, track shipments, and manage delivery schedules in one unified dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs Section -->
+  <section class="section">
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <div class="features-grid faq-grid">
+      <div class="faq-item">
+        <h3 class="faq-question">How does Fynera AI match suppliers and buyers?</h3>
+        <p class="faq-answer">Our AI analyzes real-time data including location, product type, quality, quantity, and pricing preferences to intelligently connect the right suppliers with the right buyers—reducing waste and improving efficiency.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">Is there a cost to join the platform?</h3>
+        <p class="faq-answer">Signing up is free for all user types. We offer tiered subscription plans based on usage volume and access to premium features like advanced analytics and priority matching.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">Can logistics providers integrate their own systems?</h3>
+        <p class="faq-answer">Yes! Fynera AI supports API integrations with major TMS and fleet management platforms, allowing seamless coordination of loads, tracking, and invoicing.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">What types of agricultural products are supported?</h3>
+        <p class="faq-answer">We currently support grains, fruits, vegetables, dairy, and livestock. Our platform is designed to be flexible and will expand to additional categories based on user demand.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">How is my data protected?</h3>
+        <p class="faq-answer">All data is encrypted in transit and at rest. We comply with GDPR and other relevant data privacy regulations, and never share your business data with third parties without consent.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-question">Do I need technical expertise to use Fynera AI?</h3>
+        <p class="faq-answer">Not at all! Our interface is designed for farmers, buyers, and logistics coordinators—no coding or technical background required. Onboarding support is included for all new users.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <h2>Start benefiting from Fynera AI today</h2>
+    <p>Whether you’re a supplier, buyer, or logistics provider — join our growing network and transform your agricultural trade.</p>
+    <div class="cta-buttons">
+      <a href="#" class="cta-btn supplier">Sign up as Supplier</a>
+      <a href="#" class="cta-btn buyer">Sign up as Buyer</a>
+      <a href="#" class="cta-btn logistics">Sign up as Logistics Provider</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Fynera AI. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">Terms</a>
+      <a href="#">Privacy</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="social-icons">
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter-icon lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook-icon lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (menuToggle && closeMenu && mobileMenu) {
+      menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.add('active');
+      });
+
+      closeMenu.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+      });
+
+      // Close when clicking a nav link
+      document.querySelectorAll('.mobile-menu .nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('active');
+        });
+      });
+    }
+
+    // Smooth scroll + close mobile menu
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          if (mobileMenu && mobileMenu.classList.contains('active')) {
+            mobileMenu.classList.remove('active');
+          }
+        }
+      });
+    });
+
+    // FAQ Accordion
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+        if (!isActive) {
+          item.classList.add('active');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
