@@ -30,7 +30,8 @@
       <div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-gray-200 fade-in">
         <h1 class="text-2xl font-bold text-gray-900">Add New Product</h1>
 
-        <form id="product-form" class="mt-8 space-y-6">
+        <form id="product-form" class="mt-8 space-y-6" enctype="multipart/form-data">
+          <!-- Existing fields -->
           <div>
             <label class="block text-sm font-medium text-gray-700">Product Name</label>
             <input 
@@ -90,6 +91,17 @@
             >
           </div>
 
+          <!-- NEW: Image Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Product Image</label>
+            <input 
+              type="file" 
+              id="image" 
+              accept="image/*"
+              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+            >
+          </div>
+
           <div>
             <button 
               type="submit" 
@@ -109,7 +121,7 @@
   <script>
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
     document.getElementById('product-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -122,16 +134,53 @@
       const stock_quantity = parseInt(document.getElementById('stock_quantity').value);
       const delivery_radius_km = parseInt(document.getElementById('delivery_radius_km').value);
       const region = document.getElementById('region').value;
+      const imageFile = document.getElementById('image').files[0];
 
       btn.disabled = true;
       btn.textContent = 'Adding...';
+      msg.classList.add('hidden');
 
-      const { error } = await supabase
+      let imageUrl = null;
+
+      // Upload image if provided
+      if (imageFile) {
+        const fileName = `${Date.now()}_${imageFile.name}`;
+        const { data, error } = await supabase
+          .storage
+          .from('images')
+          .upload(`products/${fileName}`, imageFile);
+
+        if (error) {
+          msg.textContent = 'Image upload failed: ' + error.message;
+          msg.className = 'mt-4 text-sm text-rose-600 font-medium';
+          msg.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = 'Add Product';
+          return;
+        }
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase
+          .storage
+          .from('images')
+          .getPublicUrl(`products/${fileName}`);
+        imageUrl = publicUrl;
+      }
+
+      // Insert product (with or without image)
+      const { error: dbError } = await supabase
         .from('products')
-        .insert([{ name, price_per_unit, stock_quantity, delivery_radius_km, region }]);
+        .insert([{ 
+          name, 
+          price_per_unit, 
+          stock_quantity, 
+          delivery_radius_km, 
+          region,
+          image_url: imageUrl // Make sure your 'products' table has this column
+        }]);
 
-      if (error) {
-        msg.textContent = 'Error: ' + error.message;
+      if (dbError) {
+        msg.textContent = 'Error: ' + dbError.message;
         msg.className = 'mt-4 text-sm text-rose-600 font-medium';
         msg.classList.remove('hidden');
       } else {

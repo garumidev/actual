@@ -65,7 +65,7 @@
   <script>
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
     async function loadProducts() {
       const { data, error } = await supabase
@@ -88,47 +88,59 @@
           <div class="col-span-full text-center py-12">
             <div class="text-gray-400 mb-4">📦</div>
             <p class="text-gray-500">No products yet. Add your first one!</p>
-            <a href="new-product.html" class="mt-4 inline-block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">+ Add Product</a>
+            <a href="supplier-new-product.html" class="mt-4 inline-block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">+ Add Product</a>
           </div>
         `;
         return;
       }
 
-      data.forEach((product, index) => {
-        const card = document.createElement('div');
-        card.className = 'product-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm';
-
+      data.forEach(product => {
         const name = product.name || 'Unnamed Product';
         const price = product.price_per_unit ? `K${parseFloat(product.price_per_unit).toFixed(2)}` : '—';
         const stock = product.stock_quantity !== undefined ? `${product.stock_quantity} units` : '—';
         const radius = product.delivery_radius_km ? `${product.delivery_radius_km} km` : '—';
         const region = product.region || '—';
+        const imageUrl = product.image_url || '';
+
+        const card = document.createElement('div');
+        card.className = 'product-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm';
 
         card.innerHTML = `
           <div class="flex justify-between items-start">
-            <h3 class="font-semibold text-gray-900 text-lg">${name}</h3>
-            <div class="flex space-x-2">
-              <a href="supplier-edit-product.html?id=${product.id}" class="text-xs text-emerald-600 font-medium hover:underline">Edit</a>
-              <button onclick="deleteProduct('${product.id}')" class="text-xs text-rose-600 font-medium hover:underline">Delete</button>
+            <div class="w-full">
+              ${imageUrl ? `
+                <div class="w-full h-32 bg-gray-100 rounded-lg overflow-hidden mb-3">
+                  <img src="${imageUrl}" alt="${name}" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+              ` : `
+                <div class="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+                  <span class="text-gray-400 text-sm">No image</span>
+                </div>
+              `}
+              <h3 class="font-semibold text-gray-900 text-lg truncate">${name}</h3>
+              <div class="mt-3 space-y-2 text-sm text-gray-600">
+                <div class="flex justify-between">
+                  <span>Price:</span>
+                  <span class="font-medium text-gray-900">${price}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Stock:</span>
+                  <span class="font-medium text-gray-900">${stock}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Delivery:</span>
+                  <span class="font-medium text-gray-900">${radius}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Region:</span>
+                  <span class="font-medium text-gray-900">${region}</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="mt-4 space-y-2 text-sm text-gray-600">
-            <div class="flex justify-between">
-              <span>Price:</span>
-              <span class="font-medium text-gray-900">${price}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Stock:</span>
-              <span class="font-medium text-gray-900">${stock}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Delivery:</span>
-              <span class="font-medium text-gray-900">${radius}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>Region:</span>
-              <span class="font-medium text-gray-900">${region}</span>
-            </div>
+          <div class="mt-4 flex justify-end space-x-2">
+            <a href="supplier-edit-product.html?id=${product.id}" class="text-xs text-emerald-600 font-medium hover:underline">Edit</a>
+            <button onclick="deleteProduct('${product.id}')" class="text-xs text-rose-600 font-medium hover:underline">Delete</button>
           </div>
         `;
         list.appendChild(card);

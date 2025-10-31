@@ -25,6 +25,10 @@
         <a href="supplier-products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
         <a href="supplier-requests.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Requests</a>
         <a href="supplier-analytics.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Analytics</a>
+        <!-- Logout Button -->
+  <button id="logoutBtn" class="w-full mt-8 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
+    Logout
+  </button>
       </nav>
     </div>
 
@@ -190,6 +194,11 @@
     }
 
     loadDashboard();
+    // Add logout handler
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+  });
   </script>
 </body>
 </html>

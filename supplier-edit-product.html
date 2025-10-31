@@ -37,7 +37,7 @@
   <script>
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
@@ -46,6 +46,15 @@
       document.getElementById('loading-message').textContent = '❌ No product ID provided.';
     } else {
       loadProduct(productId);
+    }
+
+    async function extractFilenameFromUrl(url) {
+      try {
+        const pathname = new URL(url).pathname;
+        return decodeURIComponent(pathname.split('/').pop());
+      } catch {
+        return null;
+      }
     }
 
     async function loadProduct(id) {
@@ -63,9 +72,21 @@
         return;
       }
 
+      // Build image preview
+      let imagePreview = '';
+      if (data.image_url) {
+        imagePreview = `
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Current Image</label>
+            <img src="${data.image_url}" alt="Current product" class="mt-2 h-32 object-contain border rounded">
+          </div>
+        `;
+      }
+
       container.innerHTML = `
         <h1 class="text-2xl font-bold text-gray-900">Edit Product</h1>
-        <form id="edit-form" class="mt-8 space-y-6">
+        ${imagePreview}
+        <form id="edit-form" class="mt-6 space-y-6" enctype="multipart/form-data">
           <div>
             <label class="block text-sm font-medium text-gray-700">Product Name</label>
             <input 
@@ -125,6 +146,18 @@
             >
           </div>
 
+          <!-- Image Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Replace Image (optional)</label>
+            <input 
+              type="file" 
+              id="image" 
+              accept="image/*"
+              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+            >
+            <p class="mt-1 text-xs text-gray-500">Leave blank to keep current image.</p>
+          </div>
+
           <div class="flex space-x-3">
             <button 
               type="submit" 
@@ -135,7 +168,7 @@
             </button>
             <button 
               type="button" 
-              onclick="window.location.href='products.html'"
+              onclick="window.location.href='supplier-products.html'"
               class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition"
             >
               Cancel
@@ -156,17 +189,53 @@
         const stock_quantity = parseInt(document.getElementById('stock_quantity').value);
         const delivery_radius_km = parseInt(document.getElementById('delivery_radius_km').value);
         const region = document.getElementById('region').value;
+        const imageFile = document.getElementById('image').files[0];
 
         btn.disabled = true;
         btn.textContent = 'Saving...';
+        msg.classList.add('hidden');
 
-        const { error } = await supabase
+        let imageUrl = data.image_url; // keep existing if no new image
+
+        // If user uploads a new image
+        if (imageFile) {
+          // 1. Delete old image (if exists)
+          if (data.image_url) {
+            const oldFilename = await extractFilenameFromUrl(data.image_url);
+            if (oldFilename) {
+              await supabase.storage.from('images').remove([`products/${oldFilename}`]);
+            }
+          }
+
+          // 2. Upload new image
+          const newFilename = `${Date.now()}_${imageFile.name}`;
+          const { error: uploadError } = await supabase
+            .storage
+            .from('images')
+            .upload(`products/${newFilename}`, imageFile);
+
+          if (uploadError) {
+            msg.textContent = 'Image upload failed: ' + uploadError.message;
+            msg.className = 'mt-4 text-sm text-rose-600 font-medium';
+            msg.classList.remove('hidden');
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
+            return;
+          }
+
+          // 3. Get public URL
+          const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(`products/${newFilename}`);
+          imageUrl = publicUrl;
+        }
+
+        // Update product record
+        const { error: updateError } = await supabase
           .from('products')
-          .update({ name, price_per_unit, stock_quantity, delivery_radius_km, region })
+          .update({ name, price_per_unit, stock_quantity, delivery_radius_km, region, image_url: imageUrl })
           .eq('id', id);
 
-        if (error) {
-          msg.textContent = 'Error: ' + error.message;
+        if (updateError) {
+          msg.textContent = 'Update failed: ' + updateError.message;
           msg.className = 'mt-4 text-sm text-rose-600 font-medium';
           msg.classList.remove('hidden');
         } else {
