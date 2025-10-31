@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Requests | Fynera</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { opacity: 0; animation: fadeIn 0.5s ease-out forwards; }
+    .request-card { transition: all 0.25s ease; }
+    .request-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px -2px rgba(0,0,0,0.08); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
+        <p class="text-sm text-gray-500 mt-1">Buyer Portal</p>
+      </div>
+      <nav class="space-y-2 flex-1">
+        <a href="dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+        <a href="search.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Search</a>
+        <a href="requests.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
+        <a href="new-request.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">+ New Request</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <div class="fade-in">
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">My Requests</h1>
+            <p class="text-gray-600 mt-1">Track your purchase requests and supplier responses.</p>
+          </div>
+          <a href="new-request.html" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition shadow-md hover:shadow-lg">
+            + New Request
+          </a>
+        </div>
+
+        <div id="requests-list" class="space-y-5"></div>
+        <div id="loading" class="text-gray-500 mt-8 fade-in">Loading your requests...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadRequests() {
+      const { data, error } = await supabase
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const list = document.getElementById('requests-list');
+      const loading = document.getElementById('loading');
+
+      if (error) {
+        loading.textContent = '❌ Error loading requests';
+        console.error(error);
+        return;
+      }
+
+      loading.style.display = 'none';
+
+      if (data.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-16 fade-in">
+            <div class="text-gray-400 text-5xl mb-4">📭</div>
+            <h3 class="text-lg font-medium text-gray-900">No requests yet</h3>
+            <p class="text-gray-500 mt-2">Send your first request to connect with suppliers.</p>
+            <a href="new-request.html" class="mt-4 inline-block px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition">
+              Create Request
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      data.forEach((req, index) => {
+        const card = document.createElement('div');
+        card.className = 'request-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm fade-in';
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        // Status badge styling
+        let statusClass = 'bg-gray-100 text-gray-800';
+        if (req.status === 'pending') statusClass = 'bg-amber-100 text-amber-800';
+        if (req.status === 'quoted' || req.status === 'accepted') statusClass = 'bg-emerald-100 text-emerald-800';
+        if (req.status === 'declined') statusClass = 'bg-rose-100 text-rose-800';
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold text-gray-900 text-lg">${req.product_name || 'Unnamed Product'}</h3>
+              <p class="text-gray-600 mt-1">${req.region || '—'}</p>
+            </div>
+            <span class="status-badge ${statusClass}">${req.status.charAt(0).toUpperCase() + req.status.slice(1)}</span>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-600">
+            <div><span class="font-medium">Quantity:</span> ${req.quantity || '—'} units</div>
+            <div><span class="font-medium">Requested:</span> ${new Date(req.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <p class="text-sm text-gray-500">
+              ${req.status === 'pending' ? 'Waiting for supplier quotes...' : 
+                req.status === 'quoted' ? 'Supplier has sent a quote.' : 
+                req.status === 'accepted' ? 'Request accepted. Order in progress.' : 
+                'Request declined by supplier.'}
+            </p>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // Load on page start
+    loadRequests();
+  </script>
+</body>
+</html>

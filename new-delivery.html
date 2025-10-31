@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Delivery | Fynera Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
+        <p class="text-sm text-gray-500 mt-1">Logistics Portal</p>
+      </div>
+      <nav class="space-y-2 flex-1">
+        <a href="logistics-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+        <a href="deliveries.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Deliveries</a>
+        <a href="routes.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Routes</a>
+        <a href="analytics.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Analytics</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <h1 class="text-3xl font-bold text-gray-900">Create New Delivery</h1>
+      <p class="text-gray-600 mt-1">Schedule a new road delivery.</p>
+
+      <div class="mt-8 bg-white p-6 rounded-xl border border-gray-200 shadow-sm max-w-2xl">
+        <form id="delivery-form">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tracking ID</label>
+            <input type="text" id="tracking_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Origin</label>
+            <input type="text" id="origin" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="e.g. Lusaka" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+            <input type="text" id="destination" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="e.g. Ndola" required>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select id="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="pending">Pending</option>
+              <option value="in_transit">In Transit</option>
+            </select>
+          </div>
+          <button type="submit" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition shadow-md hover:shadow-lg">
+            Create Delivery
+          </button>
+          <a href="logistics-dashboard.html" class="ml-4 text-gray-600 hover:text-gray-900">Cancel</a>
+        </form>
+        <p id="message" class="mt-4 text-sm text-emerald-600 font-medium"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('delivery-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tracking_id = document.getElementById('tracking_id').value.trim();
+      const origin = document.getElementById('origin').value.trim();
+      const destination = document.getElementById('destination').value.trim();
+      const status = document.getElementById('status').value;
+
+      const { data, error } = await supabase
+        .from('deliveries')
+        .insert([{ tracking_id, origin, destination, status }]);
+
+      const msgEl = document.getElementById('message');
+      if (error) {
+        msgEl.textContent = '❌ Error: ' + error.message;
+        msgEl.className = 'mt-4 text-sm text-rose-600 font-medium';
+      } else {
+        msgEl.textContent = '✅ Delivery created successfully!';
+        document.getElementById('delivery-form').reset();
+        setTimeout(() => window.location.href = 'deliveries.html', 1500);
+      }
+    });
+  </script>
+</body>
+</html>

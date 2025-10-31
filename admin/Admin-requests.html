@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Requests | Fynera Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { opacity: 0; animation: fadeIn 0.5s ease-out forwards; }
+    .request-card { transition: all 0.25s ease; }
+    .request-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px -2px rgba(0,0,0,0.08); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold text-emerald-700">Fynera Admin</h1>
+        <p class="text-sm text-gray-500 mt-1">Control Panel</p>
+      </div>
+      <nav class="space-y-2 flex-1">
+        <a href="dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Dashboard</a>
+        <a href="users.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Users</a>
+        <a href="products.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
+        <a href="requests.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
+        <a href="exports.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Exports</a>
+        <a href="settings.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Settings</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <div class="fade-in">
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Buyer Requests</h1>
+            <p class="text-gray-600 mt-1">Overview of all purchase requests.</p>
+          </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="mt-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-wrap gap-4 items-end">
+            <div class="min-w-[200px]">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
+              <select id="status-filter" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="quoted">Quoted</option>
+                <option value="accepted">Accepted</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+            <button 
+              id="apply-filter" 
+              class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition shadow-md hover:shadow-lg"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+
+        <!-- Requests List -->
+        <div class="mt-8">
+          <div id="requests-list" class="space-y-5"></div>
+          <div id="loading" class="text-gray-500 mt-8 fade-in">Loading requests...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Fixed: no extra spaces
+    const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function timeAgo(dateStr) {
+      const now = new Date();
+      const past = new Date(dateStr);
+      const diffMs = now - past;
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return `${diffMins} min ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours} hr ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays} day ago`;
+    }
+
+    async function loadRequests(status = '') {
+      const list = document.getElementById('requests-list');
+      const loading = document.getElementById('loading');
+      loading.style.display = 'block';
+
+      let query = supabase
+        .from('requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (status) {
+        query = query.eq('status', status);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Supabase error:', error);
+        loading.textContent = '❌ Error loading requests';
+        return;
+      }
+
+      loading.style.display = 'none';
+
+      if (!data || data.length === 0) {
+        list.innerHTML = `
+          <div class="text-center py-16 text-gray-500">
+            No requests found. Try adjusting your filters.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = '';
+      data.forEach(req => {
+        const card = document.createElement('div');
+        card.className = 'request-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm';
+
+        let statusColor = 'text-gray-600';
+        if (req.status === 'pending') statusColor = 'text-amber-600';
+        else if (req.status === 'quoted') statusColor = 'text-blue-600';
+        else if (req.status === 'accepted') statusColor = 'text-emerald-600';
+        else if (req.status === 'declined') statusColor = 'text-rose-600';
+
+        // ✅ Fixed: convert ID to string before .substring()
+        const shortId = String(req.id).substring(0, 8);
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold text-gray-900">${req.product_name || 'Unnamed Product'}</h3>
+              <p class="text-gray-600 mt-1">${req.region || '—'}</p>
+            </div>
+            <span class="text-sm font-medium ${statusColor}">${req.status}</span>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-gray-600">
+            <div><span class="font-medium">Quantity:</span> ${req.quantity || '—'} units</div>
+            <div><span class="font-medium">Requested:</span> ${req.created_at ? timeAgo(req.created_at) : '—'}</div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <p class="text-xs text-gray-500">ID: ${shortId}...</p>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // Initial load
+    loadRequests();
+
+    // Filter handler
+    document.getElementById('apply-filter').addEventListener('click', () => {
+      const status = document.getElementById('status-filter').value;
+      loadRequests(status);
+    });
+  </script>
+</body>
+</html>

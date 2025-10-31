@@ -6,16 +6,16 @@
   <title>Fynera AI | Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-  </style>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-black text-white flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
   <div class="w-full max-w-sm sm:max-w-md bg-neutral-900 p-6 sm:p-8 rounded-2xl shadow-lg">
     <div class="flex flex-col items-center mb-8">
       <div class="w-14 h-14 sm:w-16 sm:h-16 bg-green-500 rounded-full mb-3"></div>
       <h1 class="text-2xl sm:text-3xl font-bold text-green-500">Fynera AI</h1>
-      <p class="text-xs sm:text-sm text-gray-400 mt-2 text-center">Farm Produce & Agri Trading Platform</p>
+      <p class="text-xs sm:text-sm text-gray-400 mt-2 text-center">
+        Farm Produce & Agri Trading Platform
+      </p>
     </div>
 
     <form id="login-form" class="space-y-5 sm:space-y-6">
@@ -42,26 +42,74 @@
 
   <script>
     const supabaseUrl = "https://zwlsikcbexouiiegiiie.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM";
+    const supabaseKey =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM";
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const form = document.getElementById('login-form');
-    const msg = document.getElementById('message');
+    const form = document.getElementById("login-form");
+    const msg = document.getElementById("message");
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        msg.textContent = error.message;
+      msg.textContent = "Logging in...";
+      msg.className = "text-green-500 text-center mt-4";
+
+      // Step 1: Authenticate user
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({ email, password });
+
+      if (authError) {
+        console.error("Auth error:", authError);
+        msg.textContent = authError.message || "Invalid credentials.";
         msg.className = "text-red-500 text-center mt-4";
-      } else {
-        msg.textContent = "Login successful! Redirecting...";
-        msg.className = "text-green-500 text-center mt-4";
-        setTimeout(() => window.location.href = "index.html", 1500);
+        return;
       }
+
+      const authUser = authData.user;
+      const authId = authUser.id;
+
+      // Step 2: Fetch user info from public.users table
+      const { data: userRecord, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("auth_id", authId)
+        .single();
+
+      if (userError) {
+        console.warn("User not found in public.users:", userError.message);
+        msg.textContent = "User record missing. Please contact support.";
+        msg.className = "text-red-500 text-center mt-4";
+        return;
+      }
+
+      // Step 3: Determine role and redirect
+      const role = (userRecord?.role || "buyer").toLowerCase();
+      let redirectUrl = "home.html"; // default for buyer
+
+      switch (role) {
+        case "supplier":
+          redirectUrl = "supplier-dashboard.html";
+          break;
+        case "logistics":
+          redirectUrl = "dashboard.html";
+          break;
+        case "admin":
+          redirectUrl = "admin-dashboard.html";
+          break;
+        case "buyer":
+          redirectUrl = "buyer-dashboard.html";
+          break;
+      }
+
+      msg.textContent = `Login successful! Redirecting to ${role} dashboard...`;
+      msg.className = "text-green-500 text-center mt-4";
+
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1500);
     });
   </script>
 </body>

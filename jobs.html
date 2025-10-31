@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Available Jobs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold mb-6">Available Delivery Jobs</h1>
+
+  <div id="jobs-list" class="bg-white shadow rounded-lg overflow-hidden">
+    Loading available jobs...
+  </div>
+</div>
+
+<script>
+ const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function getCurrentUser() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user;
+  }
+
+  async function getLogisticsId(user_id) {
+    const { data, error } = await supabase
+      .from('logistics')
+      .select('id')
+      .eq('user_id', user_id)
+      .single();
+    if (error) throw error;
+    return data.id;
+  }
+
+  // In a real system, you'd have a "delivery_requests" table.
+  // For now, simulate available jobs by fetching deliveries with status = 'available'
+  async function fetchAvailableJobs() {
+    const { data, error } = await supabase
+      .from('deliveries')
+      .select(`
+        id,
+        supplier_id,
+        buyer_id,
+        rate,
+        distance_km,
+        created_at
+      `)
+      .eq('status', 'available')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  async function acceptJob(job_id, logistics_id) {
+    const { error } = await supabase
+      .from('deliveries')
+      .update({ 
+        logistics_id: logistics_id,
+        status: 'accepted'
+      })
+      .eq('id', job_id);
+    if (error) throw error;
+  }
+
+  function renderJobs(jobs, logistics_id) {
+    if (!jobs.length) {
+      document.getElementById('jobs-list').innerHTML = '<div class="p-6 text-gray-500">No available jobs at the moment.</div>';
+      return;
+    }
+
+    let rows = '';
+    jobs.forEach(job => {
+      rows += `
+        <tr>
+          <td class="px-6 py-4">JOB-${job.id.substring(0,6)}</td>
+          <td class="px-6 py-4">Supplier ${job.supplier_id?.substring(0,6) || 'N/A'}</td>
+          <td class="px-6 py-4">Buyer ${job.buyer_id?.substring(0,6) || 'N/A'}</td>
+          <td class="px-6 py-4">₹${job.rate || 'N/A'}</td>
+          <td class="px-6 py-4">${job.distance_km || 'N/A'} km</td>
+          <td class="px-6 py-4">
+            <button onclick="acceptJob('${job.id}', '${logistics_id}')" 
+              class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+              Accept
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('jobs-list').innerHTML = `
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Job ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buyer</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Distance</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">${rows}</tbody>
+      </table>
+    `;
+  }
+
+  // Expose acceptJob globally for inline onclick
+  window.acceptJob = async (job_id, logistics_id) => {
+    if (!confirm('Accept this job?')) return;
+    try {
+      await acceptJob(job_id, logistics_id);
+      alert('Job accepted!');
+      location.reload();
+    } catch (err) {
+      alert('Failed to accept job: ' + err.message);
+    }
+  };
+
+  (async () => {
+    try {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login.html'; return; }
+
+      const logistics_id = await getLogisticsId(user.id);
+      const jobs = await fetchAvailableJobs(); // You may need to adjust logic based on real job source
+      renderJobs(jobs, logistics_id);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('jobs-list').innerHTML = `<div class="p-6 text-red-600">Error: ${err.message}</div>`;
+    }
+  })();
+</script>
+</body>
+</html>

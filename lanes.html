@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Lanes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-gray-50 font-sans">
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Transport Lanes</h1>
+    <a href="lanes/new.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">+ Add Lane</a>
+  </div>
+
+  <div id="lanes-list" class="bg-white shadow rounded-lg overflow-hidden">
+    Loading lanes...
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function getCurrentUser() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user;
+  }
+
+  async function getLogisticsId(user_id) {
+    const { data, error } = await supabase
+      .from('logistics')
+      .select('id')
+      .eq('user_id', user_id)
+      .single();
+    if (error) throw error;
+    return data.id;
+  }
+
+  async function fetchLanes(logistics_id) {
+    const { data, error } = await supabase
+      .from('lanes')
+      .select('*')
+      .eq('logistics_id', logistics_id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  }
+
+  function renderLanes(lanes) {
+    if (!lanes.length) {
+      document.getElementById('lanes-list').innerHTML = '<div class="p-6 text-gray-500">No lanes added yet.</div>';
+      return;
+    }
+
+    let rows = '';
+    lanes.forEach(lane => {
+      const avail = lane.available ? 
+        '<span class="text-green-600">✅ Available</span>' : 
+        '<span class="text-gray-500">⏸️ Paused</span>';
+      rows += `
+        <tr>
+          <td class="px-6 py-4">${lane.lane_from} → ${lane.lane_to}</td>
+          <td class="px-6 py-4">₹${lane.rate_per_km}/km</td>
+          <td class="px-6 py-4">${lane.capacity_tons || 'N/A'} tons</td>
+          <td class="px-6 py-4">${avail}</td>
+          <td class="px-6 py-4">
+            <button class="text-blue-600 hover:underline text-sm">Edit</button>
+          </td>
+        </tr>
+      `;
+    });
+    
+    document.getElementById('lanes-list').innerHTML = `
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lane</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate/km</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Capacity</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">${rows}</tbody>
+      </table>
+    `;
+  }
+
+  (async () => {
+    try {
+      const user = await getCurrentUser();
+      if (!user) { window.location.href = '/login.html'; return; }
+
+      const logistics_id = await getLogisticsId(user.id);
+      const lanes = await fetchLanes(logistics_id);
+      renderLanes(lanes);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('lanes-list').innerHTML = `<div class="p-6 text-red-600">Error: ${err.message}</div>`;
+    }
+  })();
+</script>
+</body>
+</html>

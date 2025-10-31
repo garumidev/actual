@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Routes | Fynera Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-50">
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+      <div class="mb-10">
+        <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
+        <p class="text-sm text-gray-500 mt-1">Logistics Portal</p>
+      </div>
+      <nav class="space-y-2 flex-1">
+        <a href="logistics-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+        <a href="deliveries.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Deliveries</a>
+        <a href="routes.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Routes</a>
+        <a href="logistics-profile.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">profile</a>
+        <a href="analytics.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Analytics</a>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+      <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-900">Analytics</h1>
+        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium cursor-not-allowed" disabled>+ New (Coming Soon)</button>
+      </div>
+      <p class="text-gray-600 mt-1">Optimize your road analytics paths.</p>
+
+      <div class="mt-6 space-y-4" id="routes-list">
+        <p class="text-gray-500">Loading routes...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadRoutes() {
+      const { data: routes, error } = await supabase
+        .from('routes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const container = document.getElementById('routes-list');
+      if (error) {
+        container.innerHTML = `<p class="text-rose-600">❌ Error: ${error.message}</p>`;
+        return;
+      }
+
+      if (routes.length === 0) {
+        container.innerHTML = '<p class="text-gray-500">No routes defined yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      routes.forEach(route => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg border border-gray-200';
+        card.innerHTML = `
+          <h3 class="font-medium text-gray-900">${route.name}</h3>
+          <p class="text-sm text-gray-600 mt-1">${route.origin} → ${route.destination}</p>
+          <p class="text-xs text-gray-500 mt-1">
+            ${route.distance_km ? `${route.distance_km} km • ` : ''}
+            ${route.estimated_hours ? `~${route.estimated_hours} hrs` : ''}
+          </p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    loadRoutes();
+  </script>
+</body>
+</html>
