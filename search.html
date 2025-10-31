@@ -94,7 +94,7 @@
   <script>
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
     async function loadProducts(region = '', minPrice = null, maxPrice = null) {
       let query = supabase
@@ -145,8 +145,18 @@
         const price = product.price_per_unit ? `K${parseFloat(product.price_per_unit).toFixed(2)}` : '—';
         const stock = product.stock_quantity !== undefined ? `${product.stock_quantity} units` : '—';
         const radius = product.delivery_radius_km ? `${product.delivery_radius_km} km` : '—';
+        const imageUrl = product.image_url || '';
 
         card.innerHTML = `
+          ${imageUrl ? `
+            <div class="w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-4">
+              <img src="${imageUrl}" alt="${product.name || 'Product'}" class="w-full h-full object-cover" loading="lazy" />
+            </div>
+          ` : `
+            <div class="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+              <span class="text-gray-400 text-sm">No image</span>
+            </div>
+          `}
           <h3 class="font-semibold text-gray-900 text-lg">${product.name || 'Unnamed Product'}</h3>
           <p class="text-gray-600 mt-1">${product.region || '—'}</p>
           <div class="mt-4 space-y-2 text-sm text-gray-600">
@@ -155,7 +165,7 @@
             <div><span class="font-medium">Delivery:</span> ${radius}</div>
           </div>
           <div class="mt-5">
-            <button onclick="createRequest('${product.name || 'Unnamed Product'}', '${product.region || ''}')" 
+            <button onclick="createRequest('${product.name?.replace(/'/g, "\\'") || 'Unnamed Product'}', '${product.region?.replace(/'/g, "\\'") || ''}')" 
               class="w-full text-center text-sm text-emerald-600 font-medium hover:underline">
               Request Quote
             </button>
@@ -166,7 +176,6 @@
     }
 
     function createRequest(productName, region) {
-      // Redirect to new request with pre-filled values
       const url = new URL('new-request.html', window.location.href);
       url.searchParams.set('product', productName);
       url.searchParams.set('region', region);
