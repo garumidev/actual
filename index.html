@@ -287,7 +287,7 @@
       font-weight: 600;
       font-size: 1.1rem;
       margin-bottom: 0.5rem;
-      color: var(--text-dark); /* BLACK */
+      color: var(--text-dark);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -300,7 +300,7 @@
       transition: all 0.3s ease;
       margin: 0;
       line-height: 1.5;
-      color: var(--mint-green); /* GREEN */
+      color: var(--mint-green);
     }
 
     .faq-item.active .faq-answer {
@@ -422,11 +422,6 @@
       color: var(--main-blue);
     }
 
-    /* Mobile Menu - Hidden by default */
-    .mobile-menu {
-      display: none;
-    }
-
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
       .hero {
@@ -457,7 +452,6 @@
         font-size: 1.5rem;
       }
 
-      /* Two columns for cards on mobile */
       .benefits-grid,
       .features-grid,
       .faq-grid {
@@ -471,17 +465,14 @@
         align-items: center;
       }
 
-      /* Hide desktop nav */
       .nav-links {
         display: none;
       }
 
-      /* Show mobile toggle */
       .mobile-menu-toggle {
         display: block;
       }
 
-      /* Mobile Menu Styles */
       .mobile-menu {
         display: flex;
         position: fixed;
@@ -527,6 +518,159 @@
         margin-top: auto;
         align-self: flex-start;
       }
+    }
+
+    /* === Chatbot Styles (Vanilla CSS) === */
+    #chatbot-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+    }
+
+    #chatbot-toggle {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background-color: var(--mint-green);
+      color: white;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #chatbot-toggle:hover {
+      background-color: #0da271;
+      transform: scale(1.05);
+    }
+
+    @keyframes bounceIn {
+      0%, 20%, 40%, 60%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    #chatbot-toggle {
+      animation: bounceIn 1.5s ease;
+    }
+
+    #chatbot-window {
+      display: none;
+      flex-direction: column;
+      width: 20rem;
+      height: 24rem;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: var(--border);
+      overflow: hidden;
+      margin-top: 0.75rem;
+    }
+
+    #chatbot-window.active {
+      display: flex;
+    }
+
+    #chatbot-header {
+      background-color: var(--mint-green);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    #chatbot-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    #chatbot-messages {
+      flex: 1;
+      padding: 1rem;
+      background-color: #f8fafc;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message-bubble {
+      max-width: 80%;
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      line-height: 1.4;
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+      background-color: #dbeafe;
+      color: #1e40af;
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .ai-message {
+      background-color: var(--neutral-gray);
+      color: #065f46;
+      align-self: flex-start;
+    }
+
+    #chatbot-input-area {
+      padding: 0.75rem;
+      border-top: var(--border);
+      background: white;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #chat-input:focus {
+      outline: none;
+      border-color: var(--main-blue);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    #chat-send-btn {
+      background-color: var(--mint-green);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    #chat-send-btn:hover {
+      background-color: #0da271;
+    }
+
+    /* Ensure mobile menu is hidden on desktop */
+    .mobile-menu {
+      display: none;
     }
   </style>
 </head>
@@ -675,11 +819,36 @@
       <a href="#">Contact</a>
     </div>
     <div class="social-icons">
-      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter-icon lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook-icon lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin-icon lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/></svg></a>
+      <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
     </div>
   </footer>
+
+  <!-- AI Chatbot -->
+  <div id="chatbot-container">
+    <button id="chatbot-toggle" aria-label="Open chat">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 12h8"/><path d="M8 16h8"/><path d="M12 2a10 10 0 0 0-10 10a10 10 0 0 0 10 10a10 10 0 0 0 10-10a10 10 0 0 0-10-10z"/>
+      </svg>
+    </button>
+
+    <div id="chatbot-window">
+      <div id="chatbot-header">
+        <span>Fynera AI Assistant</span>
+        <button id="chatbot-close" aria-label="Close chat">&times;</button>
+      </div>
+      <div id="chatbot-messages">
+        <div class="message-bubble ai-message">
+          Hello! I'm Fynera AI. Ask me anything about suppliers, buyers, or logistics.
+        </div>
+      </div>
+      <div id="chatbot-input-area">
+        <input type="text" id="chat-input" placeholder="Type your question..." autocomplete="off" />
+        <button id="chat-send-btn">Send</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Mobile Menu Toggle
@@ -696,7 +865,6 @@
         mobileMenu.classList.remove('active');
       });
 
-      // Close when clicking a nav link
       document.querySelectorAll('.mobile-menu .nav-links a').forEach(link => {
         link.addEventListener('click', () => {
           mobileMenu.classList.remove('active');
@@ -704,7 +872,7 @@
       });
     }
 
-    // Smooth scroll + close mobile menu
+    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -727,6 +895,77 @@
           item.classList.add('active');
         }
       });
+    });
+
+    // === Fynera AI Chatbot Logic ===
+    const faqs = [
+      { keywords: ['match', 'matching', 'connect', 'supplier', 'buyer'], answer: "I use smart matching to connect suppliers and buyers based on location, crop type, price, and delivery range — all in real time!" },
+      { keywords: ['price', 'cost', 'fee', 'free'], answer: "Signing up is free! We offer optional premium plans for advanced features like predictive pricing and priority matching." },
+      { keywords: ['logistics', 'truck', 'delivery', 'transport'], answer: "Yes! Logistics providers can integrate their systems via API and use our load-matching tools to fill empty trucks and optimize routes." },
+      { keywords: ['product', 'crop', 'grain', 'fruit', 'vegetable', 'dairy', 'livestock'], answer: "We support grains, fruits, vegetables, dairy, and livestock. More categories will be added based on user demand!" },
+      { keywords: ['data', 'privacy', 'secure', 'safe'], answer: "Your data is encrypted and never shared without consent. We comply with GDPR and other privacy regulations." },
+      { keywords: ['use', 'easy', 'technical', 'expertise'], answer: "No technical skills needed! Our platform is built for farmers, buyers, and logistics teams — simple and intuitive." },
+      { keywords: ['how', 'work', 'platform'], answer: "Fynera AI connects agricultural suppliers, buyers, and logistics in one smart marketplace — reducing waste and improving efficiency." },
+      { keywords: ['login', 'signup'], answer: "To login or signup on Fynera AI please click the login button which will direct you to the login page; you should see the signup link there." }
+    ];
+
+    function findAnswer(question) {
+      const q = question.toLowerCase();
+      for (let item of faqs) {
+        if (item.keywords.some(kw => q.includes(kw))) {
+          return item.answer;
+        }
+      }
+      return "I'm still learning! For now, I can answer questions about matching, pricing, logistics, supported products, data privacy, and ease of use. Try asking something like: 'How does matching work?'";
+    }
+
+    const toggleBtn = document.getElementById('chatbot-toggle');
+    const closeBtn = document.getElementById('chatbot-close');
+    const windowEl = document.getElementById('chatbot-window');
+    const messagesEl = document.getElementById('chatbot-messages');
+    const inputEl = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send-btn');
+
+    function handleChatSubmit() {
+      const question = inputEl.value.trim();
+      if (!question) return;
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message-bubble user-message';
+      userMsg.textContent = question;
+      messagesEl.appendChild(userMsg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      inputEl.value = '';
+
+      setTimeout(() => {
+        const answer = findAnswer(question);
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'message-bubble ai-message';
+        aiMsg.textContent = answer;
+        messagesEl.appendChild(aiMsg);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 600);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      windowEl.classList.toggle('active');
+      if (windowEl.classList.contains('active')) {
+        inputEl.focus();
+        // Stop bounce after first click
+        toggleBtn.style.animation = 'none';
+        setTimeout(() => {
+          toggleBtn.style.animation = '';
+        }, 10);
+      }
+    });
+
+    closeBtn.addEventListener('click', () => {
+      windowEl.classList.remove('active');
+    });
+
+    sendBtn.addEventListener('click', handleChatSubmit);
+    inputEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleChatSubmit();
     });
   </script>
 
