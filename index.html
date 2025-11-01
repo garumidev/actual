@@ -968,6 +968,30 @@
       if (e.key === 'Enter') handleChatSubmit();
     });
   </script>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSRlJwY-EbUtssd2PQO8gcGNuWCHWa3d0",
+    authDomain: "ecommerce-uc.firebaseapp.com",
+    databaseURL: "https://ecommerce-uc-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "ecommerce-uc",
+    storageBucket: "ecommerce-uc.firebasestorage.app",
+    messagingSenderId: "836994472535",
+    appId: "1:836994472535:web:97fd00b8e3827e050ee112",
+    measurementId: "G-4J6RW0LR85"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 
 </body>
 </html>
