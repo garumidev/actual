@@ -39,7 +39,7 @@
     <div class="flex-1 p-8">
       <div class="fade-in">
         <h1 class="text-3xl font-bold text-gray-900">Search Products</h1>
-        <p class="text-gray-600 mt-1">Find suppliers by region and price.</p>
+        <p class="text-gray-600 mt-1">Find the best-matching suppliers by region and price.</p>
 
         <!-- Search Filters -->
         <div class="mt-8 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -96,7 +96,49 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
     const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
+    // 🔍 Smart scoring function
+    function calculateSmartScore(product, filters) {
+      let score = 0;
+
+      // Region match
+      if (filters.region && product.region) {
+        const regionMatch = product.region.toLowerCase().includes(filters.region.toLowerCase());
+        if (regionMatch) score += 30;
+      }
+
+      // Price proximity
+      if (product.price_per_unit != null) {
+        const price = parseFloat(product.price_per_unit);
+        const minP = filters.minPrice !== null && filters.minPrice !== '' ? parseFloat(filters.minPrice) : -Infinity;
+        const maxP = filters.maxPrice !== null && filters.maxPrice !== '' ? parseFloat(filters.maxPrice) : Infinity;
+
+        if (price >= minP && price <= maxP) {
+          score += 40; // Perfect match
+        } else {
+          const distanceBelow = minP - price;
+          const distanceAbove = price - maxP;
+          const closest = Math.min(Math.max(distanceBelow, 0), Math.max(distanceAbove, 0));
+          const penalty = Math.min(closest / 10, 20);
+          score += Math.max(0, 20 - penalty);
+        }
+      } else if (!filters.minPrice && !filters.maxPrice) {
+        score += 20;
+      }
+
+      // Delivery radius
+      if (product.delivery_radius_km > 0) score += 15;
+
+      // Stock availability
+      if (product.stock_quantity > 0) score += 15;
+
+      return Math.round(score * 10) / 10;
+    }
+
+    // 📦 Load & smart-sort products
     async function loadProducts(region = '', minPrice = null, maxPrice = null) {
+      const filters = { region, minPrice, maxPrice };
+
+      // Fetch all products matching region (basic filter to reduce data)
       let query = supabase
         .from('products')
         .select('*')
@@ -104,12 +146,6 @@
 
       if (region) {
         query = query.ilike('region', `%${region}%`);
-      }
-      if (minPrice !== null && minPrice !== '') {
-        query = query.gte('price_per_unit', parseFloat(minPrice));
-      }
-      if (maxPrice !== null && maxPrice !== '') {
-        query = query.lte('price_per_unit', parseFloat(maxPrice));
       }
 
       const { data, error } = await query;
@@ -125,7 +161,7 @@
 
       loading.style.display = 'none';
 
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         list.innerHTML = `
           <div class="col-span-full text-center py-16 fade-in">
             <div class="text-gray-400 text-5xl mb-4">🔍</div>
@@ -136,8 +172,15 @@
         return;
       }
 
+      // ✨ Smart sort by relevance
+      const scoredProducts = data.map(product => ({
+        ...product,
+        _score: calculateSmartScore(product, filters)
+      })).sort((a, b) => b._score - a._score);
+
+      // Render
       list.innerHTML = '';
-      data.forEach((product, index) => {
+      scoredProducts.forEach((product, index) => {
         const card = document.createElement('div');
         card.className = 'product-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm fade-in';
         card.style.animationDelay = `${index * 0.05}s`;
@@ -182,18 +225,18 @@
       window.location.href = url.toString();
     }
 
-    // Load all products on page load
+    // Initial load
     loadProducts();
 
-    // Search button handler
+    // Search button
     document.getElementById('search-btn').addEventListener('click', () => {
       const region = document.getElementById('search-region').value.trim();
       const minPrice = document.getElementById('min-price').value;
       const maxPrice = document.getElementById('max-price').value;
-      loadProducts(region, minPrice, maxPrice);
+      loadProducts(region, minPrice || null, maxPrice || null);
     });
 
-    // Optional: Auto-search on Enter
+    // Enter key support
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         document.getElementById('search-btn').click();
