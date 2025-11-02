@@ -23,7 +23,8 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
-    /* Mobile sidebar styles */
+
+    /* Mobile sidebar styles — same as in search.html */
     #mobileSidebar {
       position: fixed;
       top: 0;
@@ -33,10 +34,10 @@
       background: white;
       border-right: 1px solid #e5e7eb;
       z-index: 30;
-      transition: transform 0.3s ease;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
+      transition: transform 0.3s ease;
     }
     #mobileSidebar.open {
       transform: translateX(100%);
@@ -186,7 +187,7 @@
 
     loadRequests();
 
-    // Mobile menu toggle
+    // === Hamburger Menu Logic (same as in search.html) ===
     const mobileMenuButton = document.getElementById('mobileMenuButton');
     const mobileSidebar = document.getElementById('mobileSidebar');
     const overlay = document.getElementById('overlay');
@@ -194,7 +195,7 @@
     function openMenu() {
       mobileSidebar.classList.add('open');
       overlay.classList.add('active');
-      document.body.style.overflow = 'hidden'; // prevent background scroll
+      document.body.style.overflow = 'hidden';
     }
 
     function closeMenu() {
@@ -206,7 +207,6 @@
     mobileMenuButton.addEventListener('click', openMenu);
     overlay.addEventListener('click', closeMenu);
 
-    // Close on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && mobileSidebar.classList.contains('open')) {
         closeMenu();
