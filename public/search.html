@@ -16,11 +16,81 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* Mobile menu overlay */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 50;
+      padding: 2rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex min-h-screen">
+  <!-- Mobile Header -->
+  <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
+      <p class="text-xs text-gray-500">Buyer Portal</p>
+    </div>
+    <button id="hamburger" class="text-gray-600 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Mobile Sidebar (off-canvas) -->
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="text-xl font-bold text-emerald-700">Fynera</h2>
+        <p class="text-sm text-gray-500">Buyer Portal</p>
+      </div>
+      <button id="close-menu" class="text-gray-600 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <nav class="space-y-2">
+      <a href="buyer-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+      <a href="search.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Search</a>
+      <a href="requests.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Requests</a>
+      <a href="new-request.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">+ New Request</a>
+    </nav>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Desktop Sidebar + Main Content (hidden on mobile) -->
+  <div class="hidden md:flex min-h-screen">
     <!-- Sidebar -->
     <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
       <div class="mb-10">
@@ -91,7 +161,89 @@
     </div>
   </div>
 
+  <!-- Mobile Main Content -->
+  <div class="md:hidden p-4">
+    <div class="fade-in">
+      <h1 class="text-2xl font-bold text-gray-900">Search Products</h1>
+      <p class="text-gray-600 mt-1">Find the best-matching suppliers by region and price.</p>
+
+      <!-- Search Filters -->
+      <div class="mt-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+            <input 
+              type="text" 
+              id="search-region-mobile" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="e.g. Lusaka"
+            >
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Min Price (K)</label>
+              <input 
+                type="number" 
+                id="min-price-mobile" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="0"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Max Price (K)</label>
+              <input 
+                type="number" 
+                id="max-price-mobile" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="100"
+              >
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button 
+            id="search-btn-mobile" 
+            class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="mt-6">
+        <div id="products-list-mobile" class="space-y-4"></div>
+        <div id="loading-mobile" class="text-gray-500 mt-6 fade-in">Loading products...</div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // DOM elements
+    const hamburger = document.getElementById('hamburger');
+    const closeMenu = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('overlay');
+
+    // Toggle mobile menu
+    function toggleMenu() {
+      mobileMenu.classList.toggle('open');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    }
+
+    hamburger.addEventListener('click', toggleMenu);
+    closeMenu.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+
+    // Prevent body scroll when menu is open
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        toggleMenu();
+      }
+    });
+
+    // Firebase & Supabase config (same as before)
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
     const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
@@ -99,21 +251,16 @@
     // 🔍 Smart scoring function
     function calculateSmartScore(product, filters) {
       let score = 0;
-
-      // Region match
       if (filters.region && product.region) {
         const regionMatch = product.region.toLowerCase().includes(filters.region.toLowerCase());
         if (regionMatch) score += 30;
       }
-
-      // Price proximity
       if (product.price_per_unit != null) {
         const price = parseFloat(product.price_per_unit);
         const minP = filters.minPrice !== null && filters.minPrice !== '' ? parseFloat(filters.minPrice) : -Infinity;
         const maxP = filters.maxPrice !== null && filters.maxPrice !== '' ? parseFloat(filters.maxPrice) : Infinity;
-
         if (price >= minP && price <= maxP) {
-          score += 40; // Perfect match
+          score += 40;
         } else {
           const distanceBelow = minP - price;
           const distanceAbove = price - maxP;
@@ -124,34 +271,24 @@
       } else if (!filters.minPrice && !filters.maxPrice) {
         score += 20;
       }
-
-      // Delivery radius
       if (product.delivery_radius_km > 0) score += 15;
-
-      // Stock availability
       if (product.stock_quantity > 0) score += 15;
-
       return Math.round(score * 10) / 10;
     }
 
     // 📦 Load & smart-sort products
-    async function loadProducts(region = '', minPrice = null, maxPrice = null) {
+    async function loadProducts(region = '', minPrice = null, maxPrice = null, isMobile = false) {
       const filters = { region, minPrice, maxPrice };
-
-      // Fetch all products matching region (basic filter to reduce data)
-      let query = supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (region) {
-        query = query.ilike('region', `%${region}%`);
-      }
-
+      let query = supabase.from('products').select('*').order('created_at', { ascending: false });
+      if (region) query = query.ilike('region', `%${region}%`);
       const { data, error } = await query;
 
-      const list = document.getElementById('products-list');
-      const loading = document.getElementById('loading');
+      const list = isMobile 
+        ? document.getElementById('products-list-mobile') 
+        : document.getElementById('products-list');
+      const loading = isMobile 
+        ? document.getElementById('loading-mobile') 
+        : document.getElementById('loading');
 
       if (error) {
         loading.textContent = '❌ Error loading products';
@@ -163,26 +300,24 @@
 
       if (!data || data.length === 0) {
         list.innerHTML = `
-          <div class="col-span-full text-center py-16 fade-in">
-            <div class="text-gray-400 text-5xl mb-4">🔍</div>
-            <h3 class="text-lg font-medium text-gray-900">No products found</h3>
-            <p class="text-gray-500 mt-2">Try adjusting your filters.</p>
+          <div class="text-center py-12 fade-in">
+            <div class="text-gray-400 text-4xl mb-3">🔍</div>
+            <h3 class="text-base font-medium text-gray-900">No products found</h3>
+            <p class="text-gray-500 mt-1">Try adjusting your filters.</p>
           </div>
         `;
         return;
       }
 
-      // ✨ Smart sort by relevance
       const scoredProducts = data.map(product => ({
         ...product,
         _score: calculateSmartScore(product, filters)
       })).sort((a, b) => b._score - a._score);
 
-      // Render
       list.innerHTML = '';
       scoredProducts.forEach((product, index) => {
         const card = document.createElement('div');
-        card.className = 'product-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm fade-in';
+        card.className = 'product-card bg-white p-4 rounded-xl border border-gray-200 shadow-sm fade-in';
         card.style.animationDelay = `${index * 0.05}s`;
 
         const price = product.price_per_unit ? `K${parseFloat(product.price_per_unit).toFixed(2)}` : '—';
@@ -192,22 +327,22 @@
 
         card.innerHTML = `
           ${imageUrl ? `
-            <div class="w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-4">
+            <div class="w-full h-32 bg-gray-100 rounded-lg overflow-hidden mb-3">
               <img src="${imageUrl}" alt="${product.name || 'Product'}" class="w-full h-full object-cover" loading="lazy" />
             </div>
           ` : `
-            <div class="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <span class="text-gray-400 text-sm">No image</span>
+            <div class="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-3">
+              <span class="text-gray-400 text-xs">No image</span>
             </div>
           `}
-          <h3 class="font-semibold text-gray-900 text-lg">${product.name || 'Unnamed Product'}</h3>
-          <p class="text-gray-600 mt-1">${product.region || '—'}</p>
-          <div class="mt-4 space-y-2 text-sm text-gray-600">
+          <h3 class="font-semibold text-gray-900">${product.name || 'Unnamed Product'}</h3>
+          <p class="text-gray-600 text-sm mt-1">${product.region || '—'}</p>
+          <div class="mt-3 space-y-1 text-xs text-gray-600">
             <div><span class="font-medium">Price:</span> ${price}</div>
             <div><span class="font-medium">Stock:</span> ${stock}</div>
             <div><span class="font-medium">Delivery:</span> ${radius}</div>
           </div>
-          <div class="mt-5">
+          <div class="mt-4">
             <button onclick="createRequest('${product.name?.replace(/'/g, "\\'") || 'Unnamed Product'}', '${product.region?.replace(/'/g, "\\'") || ''}')" 
               class="w-full text-center text-sm text-emerald-600 font-medium hover:underline">
               Request Quote
@@ -226,46 +361,67 @@
     }
 
     // Initial load
-    loadProducts();
+    if (window.innerWidth >= 768) {
+      loadProducts();
+    } else {
+      loadProducts('', null, null, true);
+    }
 
-    // Search button
-    document.getElementById('search-btn').addEventListener('click', () => {
+    // Desktop search
+    document.getElementById('search-btn')?.addEventListener('click', () => {
       const region = document.getElementById('search-region').value.trim();
       const minPrice = document.getElementById('min-price').value;
       const maxPrice = document.getElementById('max-price').value;
       loadProducts(region, minPrice || null, maxPrice || null);
     });
 
+    // Mobile search
+    document.getElementById('search-btn-mobile')?.addEventListener('click', () => {
+      const region = document.getElementById('search-region-mobile').value.trim();
+      const minPrice = document.getElementById('min-price-mobile').value;
+      const maxPrice = document.getElementById('max-price-mobile').value;
+      loadProducts(region, minPrice || null, maxPrice || null, true);
+    });
+
     // Enter key support
     document.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        document.getElementById('search-btn').click();
+        if (window.innerWidth >= 768) {
+          document.getElementById('search-btn')?.click();
+        } else {
+          document.getElementById('search-btn-mobile')?.click();
+        }
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && !mobileMenu.classList.contains('open')) {
+        // Ensure mobile menu is closed on desktop view
+        mobileMenu.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
       }
     });
   </script>
+
   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBSRlJwY-EbUtssd2PQO8gcGNuWCHWa3d0",
-    authDomain: "ecommerce-uc.firebaseapp.com",
-    databaseURL: "https://ecommerce-uc-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "ecommerce-uc",
-    storageBucket: "ecommerce-uc.firebasestorage.app",
-    messagingSenderId: "836994472535",
-    appId: "1:836994472535:web:97fd00b8e3827e050ee112",
-    measurementId: "G-4J6RW0LR85"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBSRlJwY-EbUtssd2PQO8gcGNuWCHWa3d0",
+      authDomain: "ecommerce-uc.firebaseapp.com",
+      databaseURL: "https://ecommerce-uc-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ecommerce-uc",
+      storageBucket: "ecommerce-uc.firebasestorage.app",
+      messagingSenderId: "836994472535",
+      appId: "1:836994472535:web:97fd00b8e3827e050ee112",
+      measurementId: "G-4J6RW0LR85"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </body>
 </html>

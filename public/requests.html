@@ -23,70 +23,118 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
+    /* Mobile sidebar styles */
+    #mobileSidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 280px;
+      height: 100vh;
+      background: white;
+      border-right: 1px solid #e5e7eb;
+      z-index: 30;
+      transition: transform 0.3s ease;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    #mobileSidebar.open {
+      transform: translateX(100%);
+    }
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 20;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    #overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
 
   <!-- Mobile Hamburger Button -->
-  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-40 p-2 rounded-md bg-white shadow">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
     </svg>
   </button>
 
-  <div class="flex min-h-screen flex-col md:flex-row">
-    <!-- Sidebar -->
-    <div id="sidebar" class="hidden md:flex md:w-64 bg-white border-r border-gray-200 p-6 flex-col z-10">
-      <div class="mb-10">
-        <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
-        <p class="text-sm text-gray-500 mt-1">Buyer Portal</p>
-      </div>
-      <nav class="space-y-2 flex-1">
-        <a href="buyer-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
-        <a href="search.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Search</a>
-        <a href="requests.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
-        <a href="new-request.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">+ New Request</a>
-      </nav>
+  <!-- Mobile Sidebar (Off-canvas) -->
+  <div id="mobileSidebar" class="md:hidden">
+    <div class="mb-8">
+      <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
+      <p class="text-xs text-gray-500 mt-1">Buyer Portal</p>
     </div>
+    <nav class="space-y-2 flex-1">
+      <a href="buyer-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+      <a href="search.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Search</a>
+      <a href="requests.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
+      <a href="new-request.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">+ New Request</a>
+    </nav>
+  </div>
 
-    <!-- Overlay -->
-    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
+  <!-- Overlay -->
+  <div id="overlay"></div>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-4 md:p-8">
-      <div class="fade-in">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
-          <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">My Requests</h1>
-            <p class="text-gray-600 mt-1">Track your purchase requests and supplier responses.</p>
-          </div>
-          <a href="new-request.html" class="px-3 py-2 md:px-4 md:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition shadow-md hover:shadow-lg text-center text-sm md:text-base">
-            + New Request
-          </a>
+  <!-- Desktop Sidebar -->
+  <div class="hidden md:flex md:w-64 bg-white border-r border-gray-200 p-6 flex-col">
+    <div class="mb-10">
+      <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
+      <p class="text-sm text-gray-500 mt-1">Buyer Portal</p>
+    </div>
+    <nav class="space-y-2 flex-1">
+      <a href="buyer-dashboard.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Dashboard</a>
+      <a href="search.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Search</a>
+      <a href="requests.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Requests</a>
+      <a href="new-request.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">+ New Request</a>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 p-4 md:p-8">
+    <div class="fade-in">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-900">My Requests</h1>
+          <p class="text-gray-600 mt-1">Track your purchase requests and supplier responses.</p>
         </div>
-        <div id="requests-list" class="space-y-4 md:space-y-5"></div>
-        <div id="loading" class="text-gray-500 mt-6 md:mt-8 fade-in">Loading your requests...</div>
+        <a href="new-request.html" class="px-3 py-2 md:px-4 md:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition shadow-md hover:shadow-lg text-center text-sm md:text-base">
+          + New Request
+        </a>
       </div>
+      <div id="requests-list" class="space-y-4 md:space-y-5"></div>
+      <div id="loading" class="text-gray-500 mt-6 md:mt-8 fade-in">Loading your requests...</div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
+
     async function loadRequests() {
       const { data, error } = await supabase
         .from('requests')
         .select('*')
         .order('created_at', { ascending: false });
+
       const list = document.getElementById('requests-list');
       const loading = document.getElementById('loading');
+
       if (error) {
         loading.textContent = '❌ Error loading requests';
         console.error(error);
         return;
       }
+
       loading.style.display = 'none';
+
       if (data.length === 0) {
         list.innerHTML = `
           <div class="text-center py-12 md:py-16 fade-in">
@@ -100,14 +148,17 @@
         `;
         return;
       }
+
       data.forEach((req, index) => {
         const card = document.createElement('div');
         card.className = 'request-card bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm fade-in';
         card.style.animationDelay = `${index * 0.05}s`;
+
         let statusClass = 'bg-gray-100 text-gray-800';
         if (req.status === 'pending') statusClass = 'bg-amber-100 text-amber-800';
-        if (req.status === 'quoted' || req.status === 'accepted') statusClass = 'bg-emerald-100 text-emerald-800';
+        if (['quoted', 'accepted'].includes(req.status)) statusClass = 'bg-emerald-100 text-emerald-800';
         if (req.status === 'declined') statusClass = 'bg-rose-100 text-rose-800';
+
         card.innerHTML = `
           <div class="flex justify-between items-start">
             <div>
@@ -132,21 +183,34 @@
         list.appendChild(card);
       });
     }
+
     loadRequests();
 
     // Mobile menu toggle
     const mobileMenuButton = document.getElementById('mobileMenuButton');
-    const sidebar = document.getElementById('sidebar');
+    const mobileSidebar = document.getElementById('mobileSidebar');
     const overlay = document.getElementById('overlay');
 
-    mobileMenuButton.addEventListener('click', () => {
-      sidebar.classList.toggle('hidden');
-      overlay.classList.toggle('hidden');
-    });
+    function openMenu() {
+      mobileSidebar.classList.add('open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden'; // prevent background scroll
+    }
 
-    overlay.addEventListener('click', () => {
-      sidebar.classList.add('hidden');
-      overlay.classList.add('hidden');
+    function closeMenu() {
+      mobileSidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    mobileMenuButton.addEventListener('click', openMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileSidebar.classList.contains('open')) {
+        closeMenu();
+      }
     });
   </script>
 </body>
