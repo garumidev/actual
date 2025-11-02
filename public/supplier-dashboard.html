@@ -12,91 +12,200 @@
     body { font-family: 'Inter', sans-serif; }
     .stat-card { transition: all 0.2s ease; }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    /* Mobile menu (same as search.html) */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 50;
+      padding: 2rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
 
-  <!-- Mobile Hamburger Button -->
-  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
-
-  <div class="flex min-h-screen flex-col md:flex-row">
-    <!-- Sidebar -->
-    <div id="sidebar" class="hidden md:flex md:w-60 bg-white border-r border-gray-200 p-5 flex-col z-10">
+  <!-- Mobile Header -->
+  <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+    <div>
       <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
-      <nav class="mt-10 space-y-1 flex-1">
+    </div>
+    <button id="hamburger" class="text-gray-600 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Mobile Sidebar (off-canvas) -->
+  <div id="mobile-menu" class="mobile-menu">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="text-xl font-bold text-emerald-700">Fynera</h2>
+      </div>
+      <button id="close-menu" class="text-gray-600 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <nav class="space-y-2">
+      <a href="supplier-dashboard.html" class="block px-4 py-3 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Dashboard</a>
+      <a href="supplier-products.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Products</a>
+      <a href="supplier-requests.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Requests</a>
+      <a href="supplier-analytics.html" class="block px-4 py-3 text-sm text-gray-600 rounded-lg hover:bg-gray-100 transition">Analytics</a>
+      <button id="logoutBtn" class="w-full text-left px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
+        Logout
+      </button>
+    </nav>
+  </div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Desktop Layout -->
+  <div class="hidden md:flex">
+    <!-- Desktop Sidebar -->
+    <div class="w-60 bg-white border-r border-gray-200 min-h-screen p-5">
+      <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
+      <nav class="mt-10 space-y-1">
         <a href="supplier-dashboard.html" class="block px-3 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Dashboard</a>
         <a href="supplier-products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
         <a href="supplier-requests.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Requests</a>
         <a href="supplier-analytics.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Analytics</a>
-        <button id="logoutBtn" class="w-full mt-8 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
+        <button id="logoutBtnDesktop" class="w-full mt-8 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
           Logout
         </button>
       </nav>
     </div>
 
-    <!-- Overlay -->
-    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
-
-    <!-- Main Content -->
-    <div class="flex-1 p-4 md:p-8">
-      <h1 class="text-xl md:text-2xl font-bold text-gray-900">hello👋</h1>
+    <!-- Desktop Main Content -->
+    <div class="flex-1 p-8">
+      <h1 class="text-2xl font-bold text-gray-900">Good morning! 👋</h1>
       <p class="text-gray-500 mt-1">Here’s what’s happening with your business today.</p>
-      <div class="mt-6 md:mt-8 space-y-6 md:space-y-8">
+      <div class="mt-8 space-y-8">
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-xs md:text-sm font-medium text-gray-500">Total Products</h3>
-            <p id="total-products" class="text-xl md:text-2xl font-bold text-gray-900 mt-1 md:mt-2">—</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-sm font-medium text-gray-500">Total Products</h3>
+            <p id="total-products" class="text-2xl font-bold text-gray-900 mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-xs md:text-sm font-medium text-gray-500">Pending Requests</h3>
-            <p id="pending-requests" class="text-xl md:text-2xl font-bold text-emerald-600 mt-1 md:mt-2">—</p>
+          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-sm font-medium text-gray-500">Pending Requests</h3>
+            <p id="pending-requests" class="text-2xl font-bold text-emerald-600 mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-xs md:text-sm font-medium text-gray-500">Low Stock (<10)</h3>
-            <p id="low-stock" class="text-xl md:text-2xl font-bold text-rose-600 mt-1 md:mt-2">—</p>
+          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-sm font-medium text-gray-500">Low Stock (<10)</h3>
+            <p id="low-stock" class="text-2xl font-bold text-rose-600 mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-xs md:text-sm font-medium text-gray-500">Top Region</h3>
-            <p id="top-region" class="text-xl md:text-2xl font-bold text-gray-900 mt-1 md:mt-2">—</p>
+          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-sm font-medium text-gray-500">Top Region</h3>
+            <p id="top-region" class="text-2xl font-bold text-gray-900 mt-2">—</p>
           </div>
         </div>
-
         <!-- Price Trend Mini Chart -->
-        <div class="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <h2 class="font-semibold text-gray-900 text-sm md:text-base">Price Trends (Last 7 Days)</h2>
-            <a href="supplier-analytics.html" class="text-xs md:text-sm text-emerald-600 hover:underline">View all</a>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-gray-900">Price Trends (Last 7 Days)</h2>
+            <a href="supplier-analytics.html" class="text-sm text-emerald-600 hover:underline">View all</a>
           </div>
-          <div class="mt-3 md:mt-4 h-32 md:h-40 w-full">
+          <div class="mt-4 h-40 w-full">
             <canvas id="miniPriceChart"></canvas>
           </div>
         </div>
-
         <!-- Quick Actions -->
-        <div class="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h2 class="font-semibold text-gray-900 text-sm md:text-base">Quick Actions</h2>
-          <div class="mt-3 md:mt-4 flex flex-wrap gap-2 md:gap-3">
-            <a href="supplier-new-product.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">+ Add Product</a>
-            <a href="supplier-requests.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">View Requests</a>
-            <a href="supplier-analytics.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">Analytics</a>
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h2 class="font-semibold text-gray-900">Quick Actions</h2>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <a href="supplier-new-product.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">+ Add Product</a>
+            <a href="supplier-requests.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">View Requests</a>
+            <a href="supplier-analytics.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">Analytics</a>
           </div>
         </div>
       </div>
-      <div id="loading" class="text-gray-500 mt-6 md:mt-8">Loading dashboard...</div>
+      <div id="loading" class="text-gray-500 mt-8">Loading dashboard...</div>
     </div>
   </div>
 
+  <!-- Mobile Main Content -->
+  <div class="md:hidden p-4">
+    <h1 class="text-xl font-bold text-gray-900">hello there  👋</h1>
+    <p class="text-gray-500 mt-1">Your business today.</p>
+    <div class="mt-6 space-y-6">
+      <!-- Stats (simplified for mobile) -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded-lg border">
+          <p class="text-xs text-gray-500">Total Products</p>
+          <p id="total-products-mobile" class="text-lg font-bold">—</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg border">
+          <p class="text-xs text-gray-500">Pending</p>
+          <p id="pending-requests-mobile" class="text-lg font-bold text-emerald-600">—</p>
+        </div>
+      </div>
+      <div class="bg-white p-4 rounded-lg border">
+        <h2 class="font-medium text-gray-900">Quick Actions</h2>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <a href="supplier-new-product.html" class="text-xs bg-gray-100 px-3 py-1.5 rounded">+ Add Product</a>
+          <a href="supplier-requests.html" class="text-xs bg-gray-100 px-3 py-1.5 rounded">Requests</a>
+          <a href="supplier-analytics.html" class="text-xs bg-gray-100 px-3 py-1.5 rounded">Analytics</a>
+        </div>
+      </div>
+    </div>
+    <div id="loading-mobile" class="text-gray-500 mt-6">Loading...</div>
+  </div>
+
   <script>
+    // === MOBILE MENU LOGIC (identical to search.html) ===
+    const hamburger = document.getElementById('hamburger');
+    const closeMenu = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('overlay');
+
+    function toggleMenu() {
+      mobileMenu.classList.toggle('open');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    }
+
+    hamburger?.addEventListener('click', toggleMenu);
+    closeMenu?.addEventListener('click', toggleMenu);
+    overlay?.addEventListener('click', toggleMenu);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        toggleMenu();
+      }
+    });
+
+    // === SUPABASE & DASHBOARD LOGIC ===
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 
-    async function loadDashboard() {
+    async function loadDashboard(isMobile = false) {
       const { data: products } = await supabase.from('products').select('stock_quantity, region');
       const { data: requests } = await supabase.from('requests').select('id').eq('status', 'pending');
       const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -106,59 +215,93 @@
         .gte('date', sevenDaysAgo.toISOString().split('T')[0])
         .order('date', { ascending: true });
 
-      document.getElementById('loading').style.display = 'none';
+      const loading = isMobile 
+        ? document.getElementById('loading-mobile') 
+        : document.getElementById('loading');
+      loading.style.display = 'none';
+
+      // Stats
+      const updateStat = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
 
       if (products) {
-        document.getElementById('total-products').textContent = products.length;
-        document.getElementById('low-stock').textContent = products.filter(p => (p.stock_quantity || 0) < 10).length;
+        updateStat('total-products', products.length);
+        updateStat('total-products-mobile', products.length);
+        updateStat('low-stock', products.filter(p => (p.stock_quantity || 0) < 10).length);
         const regionCounts = {};
-        products.forEach(p => { const r = p.region || 'Unknown'; regionCounts[r] = (regionCounts[r] || 0) + 1; });
-        const topRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0];
-        document.getElementById('top-region').textContent = topRegion ? topRegion[0] : '—';
-      }
-      if (requests) document.getElementById('pending-requests').textContent = requests.length;
-
-      const canvas = document.getElementById('miniPriceChart');
-      if (canvas.__chart__) canvas.__chart__.destroy();
-      if (priceData?.length > 0) {
-        const chart = new Chart(canvas, {
-          type: 'line',
-          data: {
-            labels: priceData.map(p => p.date),
-            datasets: [{ label: 'Avg. Price (K)', data: priceData.map(p => p.average_price), borderColor: '#0d9488', tension: 0.3, fill: false, borderWidth: 2 }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: false, grid: { display: false }, ticks: { font: { size: 10 } } }, x: { display: true, grid: { display: false }, ticks: { font: { size: 10 } } } },
-            interaction: { mode: 'nearest', axis: 'x', intersect: false },
-            elements: { point: { radius: 2, hoverRadius: 4 } }
-          }
+        products.forEach(p => {
+          const region = p.region || 'Unknown';
+          regionCounts[region] = (regionCounts[region] || 0) + 1;
         });
-        canvas.__chart__ = chart;
+        const topRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0];
+        updateStat('top-region', topRegion ? topRegion[0] : '—');
+      }
+
+      if (requests) {
+        updateStat('pending-requests', requests.length);
+        updateStat('pending-requests-mobile', requests.length);
+      }
+
+      // Chart (desktop only)
+      if (!isMobile && priceData?.length > 0) {
+        const canvas = document.getElementById('miniPriceChart');
+        if (canvas) {
+          if (canvas.__chart__) canvas.__chart__.destroy();
+          const chart = new Chart(canvas, {
+            type: 'line',
+            data: {
+              labels: priceData.map(p => p.date),
+              datasets: [{
+                label: 'Avg. Price (K)',
+                data: priceData.map(p => p.average_price),
+                borderColor: '#0d9488',
+                tension: 0.3,
+                fill: false,
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: false, grid: { display: false } },
+                x: { display: true, grid: { display: false } }
+              },
+              interaction: { mode: 'nearest', axis: 'x', intersect: false },
+              elements: { point: { radius: 2, hoverRadius: 4 } }
+            }
+          });
+          canvas.__chart__ = chart;
+        }
       }
     }
 
-    loadDashboard();
+    // Load based on screen size
+    if (window.innerWidth >= 768) {
+      loadDashboard(false);
+    } else {
+      loadDashboard(true);
+    }
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      window.location.href = 'index.html';
+    // Handle responsive resize
+    window.addEventListener('resize', () => {
+      if (mobileMenu.classList.contains('open') && window.innerWidth >= 768) {
+        toggleMenu();
+      }
     });
 
-    // Mobile menu toggle
-    const mobileMenuButton = document.getElementById('mobileMenuButton');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+    // Logout handler (both mobile and desktop)
+    function handleLogout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
 
-    mobileMenuButton.addEventListener('click', () => {
-      sidebar.classList.toggle('hidden');
-      overlay.classList.toggle('hidden');
-    });
-
-    overlay.addEventListener('click', () => {
-      sidebar.classList.add('hidden');
-      overlay.classList.add('hidden');
-    });
+    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+    document.getElementById('logoutBtnDesktop')?.addEventListener('click', handleLogout);
   </script>
 </body>
 </html>
