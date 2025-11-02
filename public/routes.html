@@ -7,13 +7,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Inter', sans-serif; } </style>
+  <style> 
+    body { font-family: 'Inter', sans-serif; } 
+  </style>
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex min-h-screen">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
     <!-- Sidebar -->
-    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+    <div id="sidebar" class="hidden md:flex md:w-64 bg-white border-r border-gray-200 p-6 flex-col z-10">
       <div class="mb-10">
         <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
         <p class="text-sm text-gray-500 mt-1">Logistics Portal</p>
@@ -26,15 +35,20 @@
       </nav>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-8">
-      <div class="flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-900">Routes</h1>
-        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium cursor-not-allowed" disabled>+ New (Coming Soon)</button>
-      </div>
-      <p class="text-gray-600 mt-1">Optimize your road delivery paths.</p>
+    <!-- Overlay -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
 
-      <div class="mt-6 space-y-4" id="routes-list">
+    <!-- Main Content -->
+    <div class="flex-1 p-4 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Routes</h1>
+          <p class="text-gray-600 mt-1">Optimize your road delivery paths.</p>
+        </div>
+        <button class="px-3 py-2 md:px-4 md:py-2 bg-gray-200 text-gray-700 text-sm md:text-base rounded-lg font-medium cursor-not-allowed" disabled>+ New (Coming Soon)</button>
+      </div>
+
+      <div class="mt-6 space-y-3 md:space-y-4" id="routes-list">
         <p class="text-gray-500">Loading routes...</p>
       </div>
     </div>
@@ -50,25 +64,22 @@
         .from('routes')
         .select('*')
         .order('created_at', { ascending: false });
-
       const container = document.getElementById('routes-list');
       if (error) {
         container.innerHTML = `<p class="text-rose-600">❌ Error: ${error.message}</p>`;
         return;
       }
-
       if (routes.length === 0) {
         container.innerHTML = '<p class="text-gray-500">No routes defined yet.</p>';
         return;
       }
-
       container.innerHTML = '';
       routes.forEach(route => {
         const card = document.createElement('div');
         card.className = 'bg-white p-4 rounded-lg border border-gray-200';
         card.innerHTML = `
-          <h3 class="font-medium text-gray-900">${route.name}</h3>
-          <p class="text-sm text-gray-600 mt-1">${route.origin} → ${route.destination}</p>
+          <h3 class="font-medium text-gray-900 text-sm md:text-base">${route.name}</h3>
+          <p class="text-xs md:text-sm text-gray-600 mt-1">${route.origin} → ${route.destination}</p>
           <p class="text-xs text-gray-500 mt-1">
             ${route.distance_km ? `${route.distance_km} km • ` : ''}
             ${route.estimated_hours ? `~${route.estimated_hours} hrs` : ''}
@@ -79,6 +90,21 @@
     }
 
     loadRoutes();
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
+    });
   </script>
 </body>
 </html>

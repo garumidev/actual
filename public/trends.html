@@ -8,22 +8,23 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
-<body class="bg-gray-50 p-8">
+<body class="bg-gray-50 p-4 md:p-8">
 
-  <h1 class="text-3xl font-bold text-gray-900">Price Trends</h1>
-
-  <div class="mt-6 flex gap-4 items-end">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Filter by Region</label>
-      <select id="region-filter" class="mt-1 block w-48 px-3 py-2 border border-gray-300 rounded-md">
+  <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Price Trends</h1>
+  <div class="mt-4 md:mt-6 flex flex-col sm:flex-row gap-3 md:gap-4 items-end">
+    <div class="w-full sm:w-auto">
+      <label class="block text-xs md:text-sm font-medium text-gray-700">Filter by Region</label>
+      <select id="region-filter" class="mt-1 block w-full sm:w-48 px-2.5 py-1.5 md:px-3 md:py-2 border border-gray-300 rounded-md text-xs md:text-sm">
         <option value="">All Regions</option>
       </select>
     </div>
-    <button id="apply-filter" class="px-4 py-2 bg-emerald-600 text-white rounded-md">Apply</button>
+    <button id="apply-filter" class="px-3 py-1.5 md:px-4 md:py-2 bg-emerald-600 text-white rounded-md text-xs md:text-sm">
+      Apply
+    </button>
   </div>
-
-  <div class="mt-8 h-80">
+  <div class="mt-6 h-64 md:h-80">
     <canvas id="priceChart"></canvas>
   </div>
 
@@ -31,28 +32,20 @@
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     let currentChart = null;
 
     async function loadRegions() {
-      // ✅ Fetch ONLY non-null, non-empty regions
       const { data, error } = await supabase
         .from('price_trends')
         .select('region')
         .not('region', 'is', null);
-
       if (error) {
         console.error('Error loading regions:', error);
         return;
       }
-
-      // ✅ Get unique, non-empty regions
       const regions = [...new Set(
-        data
-          .map(r => r.region)
-          .filter(r => r && r.trim() !== '')
+        data.map(r => r.region).filter(r => r && r.trim() !== '')
       )].sort();
-
       const select = document.getElementById('region-filter');
       select.innerHTML = '<option value="">All Regions</option>';
       regions.forEach(region => {
@@ -67,29 +60,21 @@
       const date = new Date();
       date.setDate(date.getDate() - 30);
       const dateStr = date.toISOString().split('T')[0];
-
       let query = supabase
         .from('price_trends')
         .select('date, average_price, region')
         .gte('date', dateStr)
         .order('date', { ascending: true });
-
-      if (region) {
-        query = query.eq('region', region);
-      }
-
+      if (region) query = query.eq('region', region);
       const { data, error } = await query;
       if (error) {
         console.error('Error loading trends:', error);
         return;
       }
-
       if (currentChart) currentChart.destroy();
-
       const ctx = document.getElementById('priceChart').getContext('2d');
       const labels = data.map(d => d.date);
       const prices = data.map(d => d.average_price);
-
       currentChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -114,7 +99,6 @@
       });
     }
 
-    // Initialize
     loadRegions();
     loadTrends();
 

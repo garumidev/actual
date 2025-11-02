@@ -14,9 +14,16 @@
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex min-h-screen">
-    <!-- Sidebar -->
-    <div class="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
+    <!-- Sidebar: Hidden on mobile by default -->
+    <div id="sidebar" class="hidden md:flex md:w-64 bg-white border-r border-gray-200 p-6 flex-col z-10">
       <div class="mb-10">
         <h1 class="text-2xl font-bold text-emerald-700">Fynera</h1>
         <p class="text-sm text-gray-500 mt-1">Logistics Portal</p>
@@ -29,15 +36,22 @@
       </nav>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-8">
-      <div class="flex justify-between items-center">
-        <h1 class="text-3xl font-bold text-gray-900">All Deliveries</h1>
-        <a href="new-delivery.html" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition">+ New</a>
-      </div>
-      <p class="text-gray-600 mt-1">Manage your road deliveries.</p>
+    <!-- Overlay for mobile menu -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
 
-      <div class="mt-6 space-y-4" id="deliveries-list">
+    <!-- Main Content -->
+    <div class="flex-1 p-4 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-900">All Deliveries</h1>
+          <p class="text-gray-600 mt-1">Manage your road deliveries.</p>
+        </div>
+        <a href="new-delivery.html" class="px-3 py-2 md:px-4 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base rounded-lg font-medium transition text-center">
+          + New
+        </a>
+      </div>
+
+      <div class="mt-6 space-y-3 md:space-y-4" id="deliveries-list">
         <p class="text-gray-500">Loading deliveries...</p>
       </div>
     </div>
@@ -76,11 +90,11 @@
         const card = document.createElement('div');
         card.className = 'delivery-card bg-white p-4 rounded-lg border border-gray-200';
         card.innerHTML = `
-          <div class="flex justify-between">
-            <h3 class="font-medium text-gray-900">Delivery #${delivery.tracking_id}</h3>
-            <span class="text-sm font-medium ${statusColor}">${delivery.status.replace(/_/g, ' ')}</span>
+          <div class="flex justify-between items-start">
+            <h3 class="font-medium text-gray-900 text-sm md:text-base">Delivery #${delivery.tracking_id || 'N/A'}</h3>
+            <span class="text-xs md:text-sm font-medium ${statusColor}">${delivery.status.replace(/_/g, ' ')}</span>
           </div>
-          <p class="text-sm text-gray-600 mt-1">${delivery.origin} → ${delivery.destination}</p>
+          <p class="text-xs md:text-sm text-gray-600 mt-1">${delivery.origin} → ${delivery.destination}</p>
           <p class="text-xs text-gray-500 mt-2">Created: ${new Date(delivery.created_at).toLocaleDateString()}</p>
         `;
         container.appendChild(card);
@@ -88,6 +102,21 @@
     }
 
     loadDeliveries();
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
+    });
   </script>
 </body>
 </html>
