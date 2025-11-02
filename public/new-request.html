@@ -10,7 +10,11 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .fade-in { opacity: 0; animation: fadeIn 0.5s ease-out forwards; }
-    /* Mobile menu styles (from search.html) */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Mobile menu (exact style from search.html) */
     .mobile-menu {
       position: fixed;
       top: 0;
@@ -59,7 +63,7 @@
     </button>
   </header>
 
-  <!-- Mobile Sidebar (off-canvas) -->
+  <!-- Mobile Sidebar (off-canvas, full-screen) -->
   <div id="mobile-menu" class="mobile-menu">
     <div class="flex justify-between items-center mb-8">
       <div>
@@ -163,7 +167,7 @@
   </div>
 
   <script>
-    // Mobile menu logic (same as search.html)
+    // === MOBILE MENU LOGIC (1:1 FROM search.html) ===
     const hamburger = document.getElementById('hamburger');
     const closeMenu = document.getElementById('close-menu');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -184,7 +188,7 @@
       }
     });
 
-    // Supabase
+    // === SUPABASE SUBMISSION ===
     const SUPABASE_URL = 'https://zwlsikcbexouiiegiiie.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
     const supabase = window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
@@ -209,7 +213,8 @@
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
-      supabase.from('requests').insert([{ product_name, region, quantity, status: 'pending' }])
+      supabase.from('requests')
+        .insert([{ product_name, region, quantity, status: 'pending' }])
         .then(({ error }) => {
           if (error) {
             msg.textContent = '❌ Error: ' + error.message;
