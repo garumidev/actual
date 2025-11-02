@@ -16,71 +16,78 @@
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
     <!-- Sidebar -->
-    <div class="w-60 bg-white border-r border-gray-200 min-h-screen p-5">
+    <div id="sidebar" class="hidden md:flex md:w-60 bg-white border-r border-gray-200 p-5 flex-col z-10">
       <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
-      <nav class="mt-10 space-y-1">
+      <nav class="mt-10 space-y-1 flex-1">
         <a href="supplier-dashboard.html" class="block px-3 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Dashboard</a>
         <a href="supplier-products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
         <a href="supplier-requests.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Requests</a>
         <a href="supplier-analytics.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Analytics</a>
-        <!-- Logout Button -->
-  <button id="logoutBtn" class="w-full mt-8 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
-    Logout
-  </button>
+        <button id="logoutBtn" class="w-full mt-8 px-4 py-3 text-sm text-red-600 rounded-lg hover:bg-red-50 transition">
+          Logout
+        </button>
       </nav>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-8">
-      <h1 class="text-2xl font-bold text-gray-900">Good morning! 👋</h1>
-      <p class="text-gray-500 mt-1">Here’s what’s happening with your business today.</p>
+    <!-- Overlay -->
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
 
-      <div class="mt-8 space-y-8">
+    <!-- Main Content -->
+    <div class="flex-1 p-4 md:p-8">
+      <h1 class="text-xl md:text-2xl font-bold text-gray-900">hello👋</h1>
+      <p class="text-gray-500 mt-1">Here’s what’s happening with your business today.</p>
+      <div class="mt-6 md:mt-8 space-y-6 md:space-y-8">
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-medium text-gray-500">Total Products</h3>
-            <p id="total-products" class="text-2xl font-bold text-gray-900 mt-2">—</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-xs md:text-sm font-medium text-gray-500">Total Products</h3>
+            <p id="total-products" class="text-xl md:text-2xl font-bold text-gray-900 mt-1 md:mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-medium text-gray-500">Pending Requests</h3>
-            <p id="pending-requests" class="text-2xl font-bold text-emerald-600 mt-2">—</p>
+          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-xs md:text-sm font-medium text-gray-500">Pending Requests</h3>
+            <p id="pending-requests" class="text-xl md:text-2xl font-bold text-emerald-600 mt-1 md:mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-medium text-gray-500">Low Stock (<10)</h3>
-            <p id="low-stock" class="text-2xl font-bold text-rose-600 mt-2">—</p>
+          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-xs md:text-sm font-medium text-gray-500">Low Stock (<10)</h3>
+            <p id="low-stock" class="text-xl md:text-2xl font-bold text-rose-600 mt-1 md:mt-2">—</p>
           </div>
-          <div class="stat-card bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-medium text-gray-500">Top Region</h3>
-            <p id="top-region" class="text-2xl font-bold text-gray-900 mt-2">—</p>
+          <div class="stat-card bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm">
+            <h3 class="text-xs md:text-sm font-medium text-gray-500">Top Region</h3>
+            <p id="top-region" class="text-xl md:text-2xl font-bold text-gray-900 mt-1 md:mt-2">—</p>
           </div>
         </div>
 
         <!-- Price Trend Mini Chart -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-gray-900">Price Trends (Last 7 Days)</h2>
-            <a href="supplier-analytics.html" class="text-sm text-emerald-600 hover:underline">View all</a>
+        <div class="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <h2 class="font-semibold text-gray-900 text-sm md:text-base">Price Trends (Last 7 Days)</h2>
+            <a href="supplier-analytics.html" class="text-xs md:text-sm text-emerald-600 hover:underline">View all</a>
           </div>
-          <div class="mt-4 h-40 w-full">
+          <div class="mt-3 md:mt-4 h-32 md:h-40 w-full">
             <canvas id="miniPriceChart"></canvas>
           </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h2 class="font-semibold text-gray-900">Quick Actions</h2>
-          <div class="mt-4 flex flex-wrap gap-3">
-            <a href="supplier-new-product.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">+ Add Product</a>
-            <a href="supplier-requests.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">View Requests</a>
-            <a href="supplier-analytics.html" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition">Analytics</a>
+        <div class="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h2 class="font-semibold text-gray-900 text-sm md:text-base">Quick Actions</h2>
+          <div class="mt-3 md:mt-4 flex flex-wrap gap-2 md:gap-3">
+            <a href="supplier-new-product.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">+ Add Product</a>
+            <a href="supplier-requests.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">View Requests</a>
+            <a href="supplier-analytics.html" class="px-3 py-1.5 md:px-4 md:py-2 bg-white border border-gray-300 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-50 transition">Analytics</a>
           </div>
         </div>
       </div>
-
-      <div id="loading" class="text-gray-500 mt-8">Loading dashboard...</div>
+      <div id="loading" class="text-gray-500 mt-6 md:mt-8">Loading dashboard...</div>
     </div>
   </div>
 
@@ -90,20 +97,9 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadDashboard() {
-      // Fetch products
-      const { data: products } = await supabase
-        .from('products')
-        .select('stock_quantity, region');
-
-      // Fetch pending requests
-      const { data: requests } = await supabase
-        .from('requests')
-        .select('id')
-        .eq('status', 'pending');
-
-      // Fetch price trends (last 7 days)
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const { data: products } = await supabase.from('products').select('stock_quantity, region');
+      const { data: requests } = await supabase.from('requests').select('id').eq('status', 'pending');
+      const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const { data: priceData } = await supabase
         .from('price_trends')
         .select('date, average_price')
@@ -112,81 +108,30 @@
 
       document.getElementById('loading').style.display = 'none';
 
-      // Stats
       if (products) {
         document.getElementById('total-products').textContent = products.length;
         document.getElementById('low-stock').textContent = products.filter(p => (p.stock_quantity || 0) < 10).length;
-
         const regionCounts = {};
-        products.forEach(p => {
-          const region = p.region || 'Unknown';
-          regionCounts[region] = (regionCounts[region] || 0) + 1;
-        });
+        products.forEach(p => { const r = p.region || 'Unknown'; regionCounts[r] = (regionCounts[r] || 0) + 1; });
         const topRegion = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])[0];
         document.getElementById('top-region').textContent = topRegion ? topRegion[0] : '—';
       }
+      if (requests) document.getElementById('pending-requests').textContent = requests.length;
 
-      if (requests) {
-        document.getElementById('pending-requests').textContent = requests.length;
-      }
-
-      // Mini Price Chart
       const canvas = document.getElementById('miniPriceChart');
       if (canvas.__chart__) canvas.__chart__.destroy();
-
-      if (priceData && priceData.length > 0) {
+      if (priceData?.length > 0) {
         const chart = new Chart(canvas, {
           type: 'line',
           data: {
             labels: priceData.map(p => p.date),
-            datasets: [{
-              label: 'Avg. Price (K)',
-              data: priceData.map(p => p.average_price),
-              borderColor: '#0d9488',
-              tension: 0.3,
-              fill: false,
-              borderWidth: 2
-            }]
+            datasets: [{ label: 'Avg. Price (K)', data: priceData.map(p => p.average_price), borderColor: '#0d9488', tension: 0.3, fill: false, borderWidth: 2 }]
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-              legend: { display: false },
-              tooltip: {
-                mode: 'index',
-                intersect: false
-              }
-            },
-            scales: {
-              y: { 
-                beginAtZero: false, 
-                grid: { display: false }, 
-                ticks: { 
-                  font: { size: 10 },
-                  maxTicksLimit: 5
-                }
-              },
-              x: { 
-                display: true, 
-                grid: { display: false }, 
-                ticks: { 
-                  font: { size: 10 },
-                  maxTicksLimit: 7
-                }
-              }
-            },
-            interaction: {
-              mode: 'nearest',
-              axis: 'x',
-              intersect: false
-            },
-            elements: {
-              point: {
-                radius: 2,
-                hoverRadius: 4
-              }
-            }
+            responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: false, grid: { display: false }, ticks: { font: { size: 10 } } }, x: { display: true, grid: { display: false }, ticks: { font: { size: 10 } } } },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            elements: { point: { radius: 2, hoverRadius: 4 } }
           }
         });
         canvas.__chart__ = chart;
@@ -194,11 +139,26 @@
     }
 
     loadDashboard();
-    // Add logout handler
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.href = 'index.html';
-  });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
+    });
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
+    });
   </script>
 </body>
 </html>

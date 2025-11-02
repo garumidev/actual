@@ -15,11 +15,18 @@
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
     <!-- Sidebar -->
-    <div class="w-60 bg-white border-r border-gray-200 min-h-screen p-5">
+    <div id="sidebar" class="hidden md:flex md:w-60 bg-white border-r border-gray-200 p-5 flex-col z-10">
       <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
-      <nav class="mt-10 space-y-1">
+      <nav class="mt-10 space-y-1 flex-1">
         <a href="supplier-dashboard.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Dashboard</a>
         <a href="supplier-products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
         <a href="supplier-requests.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Requests</a>
@@ -28,21 +35,22 @@
       </nav>
     </div>
 
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
+
     <!-- Main Content -->
-    <div class="flex-1 p-8">
-      <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">Price Trends</h1>
+    <div class="flex-1 p-4 md:p-8">
+      <div class="mb-6 md:mb-8">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-900">Price Trends</h1>
         <p class="text-gray-500 mt-1">Historical average prices by product and date.</p>
       </div>
-
       <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Price</th>
+                <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Price</th>
               </tr>
             </thead>
             <tbody id="trends-body" class="bg-white divide-y divide-gray-200">
@@ -51,8 +59,7 @@
           </table>
         </div>
       </div>
-
-      <div id="loading" class="text-gray-500 mt-8">Loading price trends...</div>
+      <div id="loading" class="text-gray-500 mt-6 md:mt-8">Loading price trends...</div>
     </div>
   </div>
 
@@ -62,12 +69,11 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadPriceTrends() {
-      // Step 1: Fetch all price trends
       const { data: trends, error: trendsError } = await supabase
-        .from('price-trends')
+        .from('price_trends')
         .select('date, product_id, average_price')
         .order('date', { ascending: false })
-        .limit(100); // Limit to last 100 records
+        .limit(100);
 
       if (trendsError) {
         document.getElementById('loading').textContent = '❌ Error: ' + trendsError.message;
@@ -77,51 +83,57 @@
       if (trends.length === 0) {
         document.getElementById('trends-body').innerHTML = `
           <tr>
-            <td colspan="3" class="px-6 py-4 text-center text-gray-500">No price trends recorded yet.</td>
+            <td colspan="3" class="px-4 md:px-6 py-4 text-center text-gray-500">No price trends recorded yet.</td>
           </tr>
         `;
         document.getElementById('loading').style.display = 'none';
         return;
       }
 
-      // Step 2: Get all unique product_ids
       const productIds = [...new Set(trends.map(t => t.product_id).filter(Boolean))];
-
-      // Step 3: Fetch product names
       let productsMap = new Map();
       if (productIds.length > 0) {
         const { data: products } = await supabase
           .from('products')
           .select('id, name')
           .in('id', productIds);
-
         productsMap = new Map(products.map(p => [p.id, p.name || 'Unknown Product']));
       }
 
-      // Step 4: Render table rows
       const tbody = document.getElementById('trends-body');
       tbody.innerHTML = '';
-
       trends.forEach(trend => {
         const productName = productsMap.get(trend.product_id) || 'Unknown Product';
         const formattedDate = new Date(trend.date).toLocaleDateString();
         const price = trend.average_price ? `K${parseFloat(trend.average_price).toFixed(2)}` : '—';
-
         const row = document.createElement('tr');
         row.className = 'trend-row';
         row.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${productName}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${price}</td>
+          <td class="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-900">${formattedDate}</td>
+          <td class="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-700">${productName}</td>
+          <td class="px-4 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm font-medium text-gray-900">${price}</td>
         `;
         tbody.appendChild(row);
       });
-
       document.getElementById('loading').style.display = 'none';
     }
 
-    // Load on page start
     loadPriceTrends();
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
+    });
   </script>
 </body>
 </html>

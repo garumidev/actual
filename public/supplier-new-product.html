@@ -6,114 +6,64 @@
   <title>Add Product | Fynera</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { font-family: system-ui, sans-serif; }
-    .fade-in { animation: fadeIn 0.4s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  </style>
+  <style> body { font-family: system-ui, sans-serif; } </style>
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex">
-    <div class="w-64 bg-white border-r border-gray-200 min-h-screen p-5">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
+    <!-- Sidebar -->
+    <div id="sidebar" class="hidden md:flex md:w-64 bg-white border-r border-gray-200 p-5 flex-col z-10">
       <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
-      <nav class="mt-8 space-y-2">
+      <nav class="mt-8 space-y-2 flex-1">
         <a href="supplier-dashboard.html" class="block text-sm text-gray-600">Dashboard</a>
         <a href="supplier-products.html" class="block text-sm text-gray-600">Products</a>
         <span class="block text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-2 rounded">Add Product</span>
       </nav>
     </div>
 
-    <div class="flex-1 p-8">
-      <a href="supplier-products.html" class="text-emerald-600 hover:underline mb-6 inline-block">&larr; Back to Products</a>
-      
-      <div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-gray-200 fade-in">
-        <h1 class="text-2xl font-bold text-gray-900">Add New Product</h1>
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
 
-        <form id="product-form" class="mt-8 space-y-6" enctype="multipart/form-data">
-          <!-- Existing fields -->
+    <div class="flex-1 p-4 md:p-8">
+      <a href="supplier-products.html" class="text-emerald-600 hover:underline mb-4 md:mb-6 inline-block text-sm md:text-base">&larr; Back to Products</a>
+      <div class="max-w-2xl bg-white p-4 md:p-8 rounded-xl shadow-sm border border-gray-200">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-900">Add New Product</h1>
+        <form id="product-form" class="mt-6 md:mt-8 space-y-4 md:space-y-6" enctype="multipart/form-data">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Product Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="e.g. Fresh Tomatoes"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Product Name</label>
+            <input type="text" id="name" required class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Price per Unit (K)</label>
-            <input 
-              type="number" 
-              id="price_per_unit" 
-              step="0.01" 
-              min="0" 
-              required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="15.50"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Price per Unit (K)</label>
+            <input type="number" id="price_per_unit" step="0.01" min="0" required class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Stock Quantity</label>
-            <input 
-              type="number" 
-              id="stock_quantity" 
-              min="0" 
-              required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="100"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Stock Quantity</label>
+            <input type="number" id="stock_quantity" min="0" required class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Delivery Radius (km)</label>
-            <input 
-              type="number" 
-              id="delivery_radius_km" 
-              min="0" 
-              required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="50"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Delivery Radius (km)</label>
+            <input type="number" id="delivery_radius_km" min="0" required class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Region</label>
-            <input 
-              type="text" 
-              id="region" 
-              required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="e.g. Lusaka, Zambia"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Region</label>
+            <input type="text" id="region" required class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
           </div>
-
-          <!-- NEW: Image Upload -->
           <div>
-            <label class="block text-sm font-medium text-gray-700">Product Image</label>
-            <input 
-              type="file" 
-              id="image" 
-              accept="image/*"
-              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
-            >
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Product Image</label>
+            <input type="file" id="image" accept="image/*" class="mt-1 block w-full text-xs md:text-sm text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700">
           </div>
-
-          <div>
-            <button 
-              type="submit" 
-              id="submit-btn"
-              class="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition"
-            >
-              Add Product
-            </button>
-          </div>
+          <button type="submit" id="submit-btn" class="w-full bg-emerald-600 text-white py-2.5 md:py-3 rounded-lg font-medium hover:bg-emerald-700 transition text-sm md:text-base">
+            Add Product
+          </button>
         </form>
-
-        <div id="message" class="mt-4 hidden text-sm font-medium"></div>
+        <div id="message" class="mt-4 text-sm font-medium hidden"></div>
       </div>
     </div>
   </div>
@@ -125,10 +75,8 @@
 
     document.getElementById('product-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const btn = document.getElementById('submit-btn');
       const msg = document.getElementById('message');
-      
       const name = document.getElementById('name').value;
       const price_per_unit = parseFloat(document.getElementById('price_per_unit').value);
       const stock_quantity = parseInt(document.getElementById('stock_quantity').value);
@@ -141,15 +89,9 @@
       msg.classList.add('hidden');
 
       let imageUrl = null;
-
-      // Upload image if provided
       if (imageFile) {
         const fileName = `${Date.now()}_${imageFile.name}`;
-        const { data, error } = await supabase
-          .storage
-          .from('images')
-          .upload(`products/${fileName}`, imageFile);
-
+        const { error } = await supabase.storage.from('images').upload(`products/${fileName}`, imageFile);
         if (error) {
           msg.textContent = 'Image upload failed: ' + error.message;
           msg.className = 'mt-4 text-sm text-rose-600 font-medium';
@@ -158,26 +100,13 @@
           btn.textContent = 'Add Product';
           return;
         }
-
-        // Get public URL
-        const { data: { publicUrl } } = supabase
-          .storage
-          .from('images')
-          .getPublicUrl(`products/${fileName}`);
+        const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(`products/${fileName}`);
         imageUrl = publicUrl;
       }
 
-      // Insert product (with or without image)
       const { error: dbError } = await supabase
         .from('products')
-        .insert([{ 
-          name, 
-          price_per_unit, 
-          stock_quantity, 
-          delivery_radius_km, 
-          region,
-          image_url: imageUrl // Make sure your 'products' table has this column
-        }]);
+        .insert([{ name, price_per_unit, stock_quantity, delivery_radius_km, region, image_url: imageUrl }]);
 
       if (dbError) {
         msg.textContent = 'Error: ' + dbError.message;
@@ -190,9 +119,23 @@
         document.getElementById('product-form').reset();
         setTimeout(() => window.location.href = 'supplier-products.html', 1500);
       }
-
       btn.disabled = false;
       btn.textContent = 'Add Product';
+    });
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
     });
   </script>
 </body>

@@ -15,86 +15,88 @@
 </head>
 <body class="bg-gray-50">
 
-  <div class="flex">
+  <!-- Mobile Hamburger Button -->
+  <button id="mobileMenuButton" class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <div class="flex min-h-screen flex-col md:flex-row">
     <!-- Sidebar -->
-    <div class="w-60 bg-white border-r border-gray-200 min-h-screen p-5">
+    <div id="sidebar" class="hidden md:flex md:w-60 bg-white border-r border-gray-200 p-5 flex-col z-10">
       <h1 class="text-xl font-bold text-emerald-700">Fynera</h1>
-      <nav class="mt-10 space-y-1">
+      <nav class="mt-10 space-y-1 flex-1">
         <a href="supplier-dashboard.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Dashboard</a>
         <a href="supplier-products.html" class="block px-3 py-2.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">Products</a>
         <a href="supplier-profile.html" class="block px-3 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg">Profile</a>
       </nav>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-1 p-8">
-      <h1 class="text-2xl font-bold text-gray-900">Supplier Profile</h1>
-      <p class="text-gray-500 mt-1">Manage your business details and delivery settings.</p>
+    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-30 z-10 md:hidden"></div>
 
-      <div class="max-w-2xl mt-8 bg-white p-8 rounded-xl shadow-sm border border-gray-200 fade-in">
-        <form id="profile-form" class="space-y-6">
+    <!-- Main Content -->
+    <div class="flex-1 p-4 md:p-8">
+      <h1 class="text-xl md:text-2xl font-bold text-gray-900">Supplier Profile</h1>
+      <p class="text-gray-500 mt-1">Manage your business details and delivery settings.</p>
+      <div class="max-w-2xl mt-6 md:mt-8 bg-white p-4 md:p-8 rounded-xl shadow-sm border border-gray-200 fade-in">
+        <form id="profile-form" class="space-y-4 md:space-y-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Business Name</label>
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Business Name</label>
             <input 
               type="text" 
               id="business_name" 
               required 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               placeholder="e.g. Fresh Farms Zambia"
             >
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Phone</label>
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Phone</label>
             <input 
               type="text" 
               id="phone" 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               placeholder="+260 970 123456"
             >
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Email</label>
             <input 
               type="email" 
               id="email" 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               placeholder="supplier@freshfarms.zm"
             >
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Region</label>
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Region</label>
             <input 
               type="text" 
               id="region" 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               placeholder="Lusaka, Zambia"
             >
           </div>
-
           <div>
-            <label class="block text-sm font-medium text-gray-700">Delivery Radius (km)</label>
+            <label class="block text-xs md:text-sm font-medium text-gray-700">Delivery Radius (km)</label>
             <input 
               type="number" 
               id="delivery_radius_km" 
               min="0" 
-              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              class="mt-1 block w-full px-3 py-2 md:px-4 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               placeholder="50"
             >
           </div>
-
           <button 
             type="submit" 
             id="save-btn"
-            class="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition"
+            class="w-full bg-emerald-600 text-white py-2.5 md:py-3 rounded-lg font-medium hover:bg-emerald-700 transition text-sm md:text-base"
           >
             Save Profile
           </button>
         </form>
-
-        <div id="message" class="mt-4 hidden text-sm font-medium"></div>
+        <div id="message" class="mt-4 text-sm md:text-base font-medium hidden"></div>
       </div>
     </div>
   </div>
@@ -104,7 +106,6 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3bHNpa2NiZXhvdWlpZWdpaWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NDQ4OTksImV4cCI6MjA3NzEyMDg5OX0.9oz9F3V7cPJe2zyBY-yb3Q9v5ZJ78GGwvcm7GHjZyEM';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Load supplier profile (assume only one record for now)
     async function loadProfile() {
       const { data, error } = await supabase.from('suppliers').select('*').limit(1);
       if (error) {
@@ -123,10 +124,8 @@
 
     document.getElementById('profile-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       const btn = document.getElementById('save-btn');
       const msg = document.getElementById('message');
-      
       const profile = {
         business_name: document.getElementById('business_name').value,
         phone: document.getElementById('phone').value,
@@ -138,15 +137,12 @@
       btn.disabled = true;
       btn.textContent = 'Saving...';
 
-      // Check if record exists
       const { data } = await supabase.from('suppliers').select('id').limit(1);
       let error;
       if (data.length > 0) {
-        // Update
         const { error: err } = await supabase.from('suppliers').update(profile).eq('id', data[0].id);
         error = err;
       } else {
-        // Insert
         const { error: err } = await supabase.from('suppliers').insert([profile]);
         error = err;
       }
@@ -165,8 +161,22 @@
       btn.textContent = 'Save Profile';
     });
 
-    // Load on start
     loadProfile();
+
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    mobileMenuButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      overlay.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('hidden');
+      overlay.classList.add('hidden');
+    });
   </script>
 </body>
 </html>
