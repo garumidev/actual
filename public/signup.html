@@ -6,45 +6,54 @@
   <title>Sign Up | Fynera AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Create Buyer Account</h2>
+<body class="bg-black text-white flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-sm sm:max-w-md bg-neutral-900 p-6 sm:p-8 rounded-2xl shadow-lg">
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-14 h-14 sm:w-16 sm:h-16 bg-green-500 rounded-full mb-3"></div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-green-500">Fynera AI</h1>
+      <p class="text-xs sm:text-sm text-gray-400 mt-2 text-center">
+        Farm Produce & Agri Trading Platform
+      </p>
+    </div>
 
-    <form id="signupForm" class="space-y-4">
+    <h2 class="text-xl font-bold text-center mb-6">Create Buyer Account</h2>
+
+    <form id="signupForm" class="space-y-5 sm:space-y-6">
       <div>
-        <label class="block mb-2 text-gray-700">Full Name</label>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
         <input type="text" id="name" required
-               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+               class="w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
       </div>
 
       <div>
-        <label class="block mb-2 text-gray-700">Email</label>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
         <input type="email" id="email" required
-               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+               class="w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
       </div>
 
       <div>
-        <label class="block mb-2 text-gray-700">Password</label>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
         <input type="password" id="password" required
-               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+               class="w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
       </div>
 
       <div>
-        <label class="block mb-2 text-gray-700">Region (optional)</label>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Region (optional)</label>
         <input type="text" id="region" placeholder="e.g., Lusaka"
-               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+               class="w-full p-3 rounded-md bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500" />
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300">
+      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-md font-semibold text-white transition">
         Sign Up
       </button>
     </form>
 
     <p id="msg" class="text-center mt-4 text-sm"></p>
-    <p class="text-center text-gray-600 mt-4">
-      Already have an account? 
-      <a href="login.html" class="text-blue-600 hover:underline">Log in</a>
+    <p class="text-center text-gray-400 mt-6 text-sm">
+      Already have an account?
+      <a href="login.html" class="text-green-500 hover:underline">Log in</a>
     </p>
   </div>
 
@@ -67,7 +76,7 @@
       const region = document.getElementById("region").value.trim();
 
       msg.textContent = "Signing up...";
-      msg.className = "text-blue-600 text-center mt-4";
+      msg.className = "text-green-500 text-center mt-4";
 
       try {
         // 1️⃣ Sign up user with Supabase Auth
@@ -92,7 +101,7 @@
         if (insertError) throw insertError;
 
         msg.textContent = "Signup successful! Redirecting to login...";
-        msg.className = "text-green-600 text-center mt-4";
+        msg.className = "text-green-500 text-center mt-4";
         setTimeout(() => window.location.href = "login.html", 2000);
 
       } catch (err) {
@@ -102,29 +111,25 @@
       }
     });
   </script>
+
+  <!-- Firebase (kept once, as in login.html) -->
   <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBSRlJwY-EbUtssd2PQO8gcGNuWCHWa3d0",
-    authDomain: "ecommerce-uc.firebaseapp.com",
-    databaseURL: "https://ecommerce-uc-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "ecommerce-uc",
-    storageBucket: "ecommerce-uc.firebasestorage.app",
-    messagingSenderId: "836994472535",
-    appId: "1:836994472535:web:97fd00b8e3827e050ee112",
-    measurementId: "G-4J6RW0LR85"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBSRlJwY-EbUtssd2PQO8gcGNuWCHWa3d0",
+      authDomain: "ecommerce-uc.firebaseapp.com",
+      databaseURL: "https://ecommerce-uc-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ecommerce-uc",
+      storageBucket: "ecommerce-uc.firebasestorage.app",
+      messagingSenderId: "836994472535",
+      appId: "1:836994472535:web:97fd00b8e3827e050ee112",
+      measurementId: "G-4J6RW0LR85"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </body>
 </html>
